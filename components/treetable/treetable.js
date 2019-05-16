@@ -2858,7 +2858,10 @@ var CdkVirtualScrollViewportPatchDirective = /** @class */ (function () {
         var _this = this;
         rxjs_1.fromEvent(window, 'resize')
             .pipe(operators_1.debounceTime(10), operators_1.takeUntil(this.destroy$))
-            .subscribe(function () { return _this.viewportComponent.checkViewportSize(); });
+            .subscribe(function () {
+            debugger;
+            _this.viewportComponent.checkViewportSize();
+        });
     };
     CdkVirtualScrollViewportPatchDirective.prototype.ngOnDestroy = function () {
         this.destroy$.next();
