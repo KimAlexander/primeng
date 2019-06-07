@@ -114,11 +114,11 @@ export class Dialog implements OnDestroy {
     
     @ContentChildren(Footer, {descendants: false}) footerFacet: QueryList<Header>;
         
-    @ViewChild('titlebar') headerViewChild: ElementRef;
+    @ViewChild('titlebar', { static: false }) headerViewChild: ElementRef;
     
-    @ViewChild('content') contentViewChild: ElementRef;
+    @ViewChild('content', { static: false }) contentViewChild: ElementRef;
 
-    @ViewChild('footer') footerViewChild: ElementRef;
+    @ViewChild('footer', { static: false }) footerViewChild: ElementRef;
 
     @Output() onShow: EventEmitter<any> = new EventEmitter();
 
@@ -233,7 +233,7 @@ export class Dialog implements OnDestroy {
     
     positionOverlay() {
         let viewport = DomHandler.getViewport();
-        if (DomHandler.getOuterHeight(this.container) > viewport.height) {
+        if (DomHandler.getOuterHeight(this.container) + this.contentViewChild.nativeElement.scrollHeight - this.contentViewChild.nativeElement.clientHeight > viewport.height) {
              this.contentViewChild.nativeElement.style.height = (viewport.height * .75) + 'px';
              this.container.style.height = 'auto';
         } 
@@ -410,28 +410,12 @@ export class Dialog implements OnDestroy {
         }
     }
 
-    getFocusableElements() {
-        let focusableElements = DomHandler.find(this.container,`button:not([tabindex = "-1"]):not([disabled]):not([style*="display:none"]):not([hidden]), 
-                [href][clientHeight][clientWidth]:not([tabindex = "-1"]):not([disabled]):not([style*="display:none"]):not([hidden]), 
-                input:not([tabindex = "-1"]):not([disabled]):not([style*="display:none"]):not([hidden]), select:not([tabindex = "-1"]):not([disabled]):not([style*="display:none"]):not([hidden]), 
-                textarea:not([tabindex = "-1"]):not([disabled]):not([style*="display:none"]):not([hidden]), [tabIndex]:not([tabIndex = "-1"]):not([disabled]):not([style*="display:none"]):not([hidden]), 
-                [contenteditable]:not([tabIndex = "-1"]):not([disabled]):not([style*="display:none"]):not([hidden])`
-            );
-
-            let visibleFocusableElements = [];
-            for(let focusableElement of focusableElements) {
-                if(getComputedStyle(focusableElement).display != "none" && getComputedStyle(focusableElement).visibility != "hidden")
-                    visibleFocusableElements.push(focusableElement);
-            }
-        return visibleFocusableElements;
-    }
-
     onKeydown(event: KeyboardEvent) {
         if(this.focusTrap) {
             if(event.which === 9) {
                 event.preventDefault();
                 
-                let focusableElements = this.getFocusableElements();
+                let focusableElements = DomHandler.getFocusableElements(this.container);
 
                 if (focusableElements && focusableElements.length > 0) {
                     if (!document.activeElement) {
