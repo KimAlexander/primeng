@@ -301,6 +301,8 @@ export class TreeTable implements AfterContentInit, OnInit, OnDestroy, Blockable
 
     selectionKeys: any = {};
 
+    cdkViewpor: CdkVirtualScrollViewport;
+
     rowTouched: boolean;
 
     editingCell: Element;
@@ -1872,6 +1874,7 @@ export class TTScrollableView implements AfterViewInit, OnDestroy, AfterViewChec
     }
 
     ngAfterViewInit() {
+        this.tt.cdkViewpor = this.viewPortViewChild;
         this.bindEvents();
         this.setScrollHeight();
         this.alignScrollBar();
