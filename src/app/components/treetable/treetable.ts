@@ -1876,6 +1876,10 @@ export class TTScrollableView implements AfterViewInit, OnDestroy, AfterViewChec
         this.alignScrollBar();
 
         if (this.tt.cdkVirtualScroll) {
+            this.tt.tableService.uiUpdateSource$.subscribe(() => {
+                this.scrollHeaderBoxViewChild.nativeElement.style.marginLeft = -1 * this.viewPortViewChild.elementRef.nativeElement.scrollLeft + 'px';
+            })
+
             this.scrollDispatcherSubscription = this.scrollDispatcher.scrolled()
                 .subscribe(() => {
                     this.scrollHeaderBoxViewChild.nativeElement.style.marginLeft = -1 * this.viewPortViewChild.elementRef.nativeElement.scrollLeft + 'px';
