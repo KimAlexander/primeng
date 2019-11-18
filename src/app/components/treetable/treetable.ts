@@ -1747,7 +1747,7 @@ export class TTBody {
         </div>
         <div #scrollBody class="ui-treetable-scrollable-body">
             <div *ngIf="tt.cdkVirtualScroll" #virtualScrollBody>
-                <cdk-virtual-scroll-viewport #viewport itemSize="18" style="height:550px;">
+                <cdk-virtual-scroll-viewport #viewport itemSize="22" style="height:550px;">
                     <table #scrollTable [ngClass]="{'ui-treetable-scrollable-body-table': true, 'ui-treetable-virtual-table': tt.virtualScroll}">
                         <ng-container *ngTemplateOutlet="frozen ? tt.frozenColGroupTemplate||tt.colGroupTemplate : tt.colGroupTemplate; context {$implicit: columns}"></ng-container>
                         <tbody class="ui-treetable-tbody" [pTreeTableBody]="columns" [pTreeTableBodyTemplate]="frozen ? tt.frozenBodyTemplate||tt.bodyTemplate : tt.bodyTemplate"></tbody>
