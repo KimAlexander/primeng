@@ -1,7 +1,7 @@
-import {NgModule,Component,Input,Output,EventEmitter,ElementRef,ContentChild} from '@angular/core';
+import {NgModule,Component,Input,Output,EventEmitter,ElementRef,ContentChild,ChangeDetectionStrategy} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SharedModule,Footer} from '../common/shared';
-import {BlockableUI} from '../common/blockableui';
+import {SharedModule,Footer} from 'primeng/api';
+import {BlockableUI} from 'primeng/api';
 import {trigger,state,style,transition,animate} from '@angular/animations';
 
 let idx: number = 0;
@@ -11,8 +11,8 @@ let idx: number = 0;
     template: `
         <div [attr.id]="id" [ngClass]="'ui-panel ui-widget ui-widget-content ui-corner-all'" [ngStyle]="style" [class]="styleClass">
             <div [ngClass]="{'ui-panel-titlebar ui-widget-header ui-helper-clearfix ui-corner-all': true, 'ui-panel-titlebar-clickable': (toggleable && toggler === 'header')}" 
-                *ngIf="showHeader" (click)="onHeaderClick($event)">
-                <span class="ui-panel-title" *ngIf="header">{{header}}</span>
+                *ngIf="showHeader" (click)="onHeaderClick($event)" [attr.id]="id + '-titlebar'">
+                <span class="ui-panel-title" *ngIf="header" [attr.id]="id + '_header'">{{header}}</span>
                 <ng-content select="p-header"></ng-content>
                 <a *ngIf="toggleable" [attr.id]="id + '-label'" class="ui-panel-titlebar-icon ui-panel-titlebar-toggler ui-corner-all ui-state-default" tabindex="0"
                     (click)="onIconClick($event)" (keydown.enter)="onIconClick($event)" [attr.aria-controls]="id + '-content'" role="tab" [attr.aria-expanded]="!collapsed">
@@ -21,7 +21,7 @@ let idx: number = 0;
             </div>
             <div [attr.id]="id + '-content'" class="ui-panel-content-wrapper" [@panelContent]="collapsed ? {value: 'hidden', params: {transitionParams: animating ? transitionOptions : '0ms', height: '0', opacity:'0'}} : {value: 'visible', params: {transitionParams: animating ? transitionOptions : '0ms', height: '*', opacity: '1'}}" (@panelContent.done)="onToggleDone($event)"
                 [ngClass]="{'ui-panel-content-wrapper-overflown': collapsed||animating}"
-                role="region" [attr.aria-hidden]="collapsed" [attr.aria-labelledby]="id + '-label'">
+                role="region" [attr.aria-hidden]="collapsed" [attr.aria-labelledby]="id  + '-titlebar'">
                 <div class="ui-panel-content ui-widget-content">
                     <ng-content></ng-content>
                 </div>
@@ -50,7 +50,8 @@ let idx: number = 0;
             transition('void => hidden', animate('{{transitionParams}}')),
             transition('void => visible', animate('{{transitionParams}}'))
         ])
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class Panel implements BlockableUI {
 
@@ -80,7 +81,7 @@ export class Panel implements BlockableUI {
     
     @Input() transitionOptions: string = '400ms cubic-bezier(0.86, 0, 0.07, 1)';
 
-    @ContentChild(Footer, { static: false }) footerFacet;
+    @ContentChild(Footer) footerFacet;
     
     animating: boolean;
     
@@ -101,15 +102,15 @@ export class Panel implements BlockableUI {
     }
     
     toggle(event: Event) {
-        if(this.animating) {
+        if (this.animating) {
             return false;
         }
         
         this.animating = true;
         this.onBeforeToggle.emit({originalEvent: event, collapsed: this.collapsed});
         
-        if(this.toggleable) {
-            if(this.collapsed)
+        if (this.toggleable) {
+            if (this.collapsed)
                 this.expand(event);
             else
                 this.collapse(event);

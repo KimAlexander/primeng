@@ -44,9 +44,9 @@ describe('InputMask', () => {
         expect(inputMaskEl.nativeElement).toBeTruthy();
     });
 
-    it('should change style styleClass placeholder inputId size tabindex and autoFocus', () => {
+    it('should change style styleClass placeholder inputId size tabindex title and autoFocus', () => {
         inputmask.mask = "99-999999";
-        inputmask.style = { 'primeng': 'rocks' }
+        inputmask.style = { 'height': '300px' }
         inputmask.styleClass = "PrimengRocks";
         inputmask.placeholder = "GiveMeANumber";
         inputmask.inputId = "primeng";
@@ -54,11 +54,12 @@ describe('InputMask', () => {
         inputmask.tabindex = "1";
         inputmask.required = true;
         inputmask.autoFocus = true;
+        inputmask.title = "TheTitle";
         fixture.detectChanges();
 
         const inputMaskEl = fixture.debugElement.query(By.css('input'));
         expect(inputMaskEl.nativeElement).toBeTruthy();
-        expect(inputMaskEl.nativeElement.style['primeng']).toEqual("rocks");
+        expect(inputMaskEl.nativeElement.style['height']).toEqual("300px");
         expect(inputMaskEl.nativeElement.className).toContain("PrimengRocks");
         expect(inputMaskEl.nativeElement.placeholder).toEqual("GiveMeANumber");
         expect(inputMaskEl.nativeElement.id).toEqual("primeng");
@@ -66,6 +67,7 @@ describe('InputMask', () => {
         expect(inputMaskEl.nativeElement.tabIndex).toEqual(1);
         expect(inputMaskEl.nativeElement.required).toBeTruthy();
         expect(inputMaskEl.nativeElement.autofocus).toBeTruthy();
+        expect(inputMaskEl.nativeElement.title).toEqual("TheTitle");
     });
 
     it('should change value with keydown event', () => {
@@ -239,14 +241,34 @@ describe('InputMask', () => {
         expect(onInputFocusSpy).toHaveBeenCalled();
     });
 
-    it('should focus on input (manually)', () => {
-        inputmask.mask = "99-999999";
+    it('should disabled with setDisabledState', () => {
+        inputmask.setDisabledState(true);
         fixture.detectChanges();
 
         inputmask.focus();
         fixture.detectChanges();
 
-        let inputMaskEl = fixture.debugElement.query(By.css('input'));
-        expect(inputMaskEl.parent.nativeElement.className).toContain("ui-inputwrapper-focus");
+        expect(document.activeElement).not.toEqual(inputmask.inputViewChild.nativeElement);
+    });
+
+    it('should be readonly', () => {
+        inputmask.readonly = true;
+        fixture.detectChanges();
+
+        const updateModelSpy = spyOn(inputmask, "updateModel").and.callThrough();
+        const inputMaskEl = fixture.debugElement.query(By.css("input"));
+        const event: any = document.createEvent('CustomEvent');
+        event.which = 13;
+        event.initEvent('keydown', true, true);
+        inputMaskEl.nativeElement.dispatchEvent(event as KeyboardEvent);
+        event.initEvent('input', true, true);
+        inputMaskEl.nativeElement.dispatchEvent(event as KeyboardEvent);
+        event.initEvent('keypress', true, true);
+        inputMaskEl.nativeElement.dispatchEvent(event as KeyboardEvent);
+        inputMaskEl.nativeElement.dispatchEvent(new Event("focus"));
+        fixture.detectChanges();
+
+        expect(document.activeElement).not.toEqual(inputmask.inputViewChild.nativeElement);
+        expect(updateModelSpy).not.toHaveBeenCalled();
     });
 });

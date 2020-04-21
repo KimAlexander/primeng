@@ -1,10 +1,11 @@
-import { NgModule, Component, ElementRef, Input, Output, EventEmitter, AfterContentInit, ContentChildren, ContentChild, QueryList, TemplateRef,forwardRef, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { NgModule, Component, ElementRef, Input, Output, EventEmitter, AfterContentInit, ContentChildren, ContentChild, QueryList, TemplateRef,forwardRef, ChangeDetectorRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SelectItem } from '../common/selectitem';
-import { SharedModule, PrimeTemplate, Footer, Header } from '../common/shared';
-import { DomHandler } from '../dom/domhandler';
-import { ObjectUtils } from '../utils/objectutils';
+import { SelectItem } from 'primeng/api';
+import { SharedModule, PrimeTemplate, Footer, Header } from 'primeng/api';
+import { DomHandler } from 'primeng/dom';
+import { ObjectUtils } from 'primeng/utils';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
+import { FilterUtils } from 'primeng/utils';
 
 export const LISTBOX_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR,
@@ -32,15 +33,15 @@ export const LISTBOX_VALUE_ACCESSOR: any = {
           </div>
         </div>
         <div class="ui-listbox-filter-container" *ngIf="filter">
-          <input type="text" role="textbox" [value]="filterValue||''" (input)="onFilter($event)" class="ui-inputtext ui-widget ui-state-default ui-corner-all" [disabled]="disabled" [attr.aria-label]="ariaFilterLabel">
+          <input type="text" [value]="filterValue||''" (input)="onFilter($event)" class="ui-inputtext ui-widget ui-state-default ui-corner-all" [disabled]="disabled" [attr.placeholder]="filterPlaceHolder" [attr.aria-label]="ariaFilterLabel">
           <span class="ui-listbox-filter-icon pi pi-search"></span>
         </div>
       </div>
       <div class="ui-listbox-list-wrapper" [ngStyle]="listStyle">
-        <ul class="ui-listbox-list">
+        <ul class="ui-listbox-list" role="listbox" aria-multiselectable="multiple">
           <li *ngFor="let option of options; let i = index;" [style.display]="isItemVisible(option) ? 'block' : 'none'" [attr.tabindex]="option.disabled ? null : '0'"
-              [ngClass]="{'ui-listbox-item ui-corner-all':true,'ui-state-highlight':isSelected(option), 'ui-state-disabled': option.disabled}" [attr.aria-label]="option.label"
-              (click)="onOptionClick($event,option)" (dblclick)="onOptionDoubleClick($event,option)" (touchend)="onOptionTouchEnd($event,option)" (keydown)="onOptionKeyDown($event,option)">
+              [ngClass]="{'ui-listbox-item ui-corner-all':true,'ui-state-highlight':isSelected(option), 'ui-state-disabled': option.disabled}" role="option" [attr.aria-label]="option.label"
+              [attr.aria-selected]="isSelected(option)" (click)="onOptionClick($event,option)" (dblclick)="onOptionDoubleClick($event,option)" (touchend)="onOptionTouchEnd($event,option)" (keydown)="onOptionKeyDown($event,option)">
             <div class="ui-chkbox ui-widget" *ngIf="checkbox && multiple">
               <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default" [ngClass]="{'ui-state-active':isSelected(option)}">
                 <span class="ui-chkbox-icon ui-clickable" [ngClass]="{'pi pi-check':isSelected(option)}"></span>
@@ -56,7 +57,8 @@ export const LISTBOX_VALUE_ACCESSOR: any = {
       </div>
     </div>
   `,
-    providers: [LISTBOX_VALUE_ACCESSOR]
+    providers: [LISTBOX_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class Listbox implements AfterContentInit, ControlValueAccessor {
 
@@ -78,6 +80,8 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
 
     @Input() filterMode: string = 'contains';
 
+    @Input() filterLocale: string;
+
     @Input() metaKeySelection: boolean = true;
 
     @Input() dataKey: string;
@@ -88,17 +92,19 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
 
     @Input() ariaFilterLabel: string;
 
+    @Input() filterPlaceHolder: string;
+
     @Output() onChange: EventEmitter<any> = new EventEmitter();
 
     @Output() onClick: EventEmitter<any> = new EventEmitter();
 
     @Output() onDblClick: EventEmitter<any> = new EventEmitter();
 
-    @ViewChild('headerchkbox', { static: false }) headerCheckboxViewChild: ElementRef;
+    @ViewChild('headerchkbox') headerCheckboxViewChild: ElementRef;
 
-    @ContentChild(Header, { static: false }) headerFacet;
+    @ContentChild(Header) headerFacet;
 
-    @ContentChild(Footer, { static: false }) footerFacet;
+    @ContentChild(Footer) footerFacet;
 
     @ContentChildren(PrimeTemplate) templates: QueryList<any>;
 
@@ -121,7 +127,9 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
     public _options: any[];
 
     public headerCheckboxFocus: boolean;
-    
+
+    public disabledSelectedOptions: SelectItem[] = [];
+
     constructor(public el: ElementRef, public cd: ChangeDetectorRef) { }
 
     @Input() get options(): any[] {
@@ -132,11 +140,11 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
         let opts = this.optionLabel ? ObjectUtils.generateSelectItems(val, this.optionLabel) : val;
         this._options = opts;
     }
-    
+
     @Input() get filterValue(): string {
         return this._filterValue;
     }
-    
+
     set filterValue(val: string) {
         this._filterValue = val;
     }
@@ -157,6 +165,7 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
 
     writeValue(value: any): void {
         this.value = value;
+        this.setDisabledSelectedOptions();
         this.cd.markForCheck();
     }
 
@@ -188,6 +197,7 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
         }
         this.onClick.emit({
             originalEvent: event,
+            option: option,
             value: this.value
         });
         this.optionTouched = false;
@@ -208,6 +218,7 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
 
         this.onDblClick.emit({
             originalEvent: event,
+            option: option,
             value: this.value
         })
     }
@@ -335,10 +346,15 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
     }
 
     get allChecked(): boolean {
-        if (this.filterValue)
+        if (this.filterValue) {
             return this.allFilteredSelected();
-        else
-            return this.value && this.options && (this.value.length > 0 && this.value.length === this.getEnabledOptionCount());
+        }
+        else {
+            let optionCount = this.getEnabledOptionCount();
+            let disabledSelectedOptionCount = this.disabledSelectedOptions.length;
+
+            return this.value && this.options && (this.value.length > 0 && this.value.length == optionCount + disabledSelectedOptionCount);
+        }
     }
 
     getEnabledOptionCount(): number {
@@ -386,11 +402,22 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
         }
 
         if (this.allChecked) {
-            this.value = [];
+            if (this.disabledSelectedOptions && this.disabledSelectedOptions.length > 0) {
+                let value = [];
+                value = [...this.disabledSelectedOptions];
+                this.value = value;
+            }
+            else {
+                this.value = [];
+            }
         }
         else {
             if (this.options) {
                 this.value = [];
+                if (this.disabledSelectedOptions && this.disabledSelectedOptions.length > 0) {
+                    this.value = [...this.disabledSelectedOptions];
+                }
+
                 for (let i = 0; i < this.options.length; i++) {
                     let opt = this.options[i];
                     if (this.isItemVisible(opt) && !opt.disabled) {
@@ -408,19 +435,12 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
     isItemVisible(option: SelectItem): boolean {
         if (this.filterValue) {
             let visible;
-            let filterText = ObjectUtils.removeAccents(this.filterValue).toLowerCase();
 
-            switch (this.filterMode) {
-                case 'startsWith':
-                    visible = ObjectUtils.removeAccents(option.label).toLowerCase().indexOf(filterText) === 0;
-                    break;
-
-                case 'contains':
-                    visible = ObjectUtils.removeAccents(option.label).toLowerCase().indexOf(filterText) > -1;
-                    break;
-
-                default:
-                    visible = true;
+            if (this.filterMode) {
+                visible = FilterUtils[this.filterMode](option.label, this.filterValue, this.filterLocale);
+            }
+            else {
+                visible = true;
             }
 
             return visible;
@@ -437,35 +457,35 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
     onInputBlur(event) {
         this.focus = false;
     }
-    
+
     onOptionKeyDown(event:KeyboardEvent, option) {
         if (this.readonly) {
             return;
         }
-        
+
         let item = <HTMLLIElement> event.currentTarget;
-        
+
         switch(event.which) {
             //down
             case 40:
                 var nextItem = this.findNextItem(item);
-                if(nextItem) {
+                if (nextItem) {
                     nextItem.focus();
                 }
-                
+
                 event.preventDefault();
             break;
-            
+
             //up
             case 38:
                 var prevItem = this.findPrevItem(item);
-                if(prevItem) {
+                if (prevItem) {
                     prevItem.focus();
                 }
-                
+
                 event.preventDefault();
             break;
-            
+
             //enter
             case 13:
                 this.onOptionClick(event, option);
@@ -473,7 +493,7 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
             break;
         }
     }
-    
+
     findNextItem(item) {
         let nextItem = item.nextElementSibling;
 
@@ -485,16 +505,16 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
 
     findPrevItem(item) {
         let prevItem = item.previousElementSibling;
-        
+
         if (prevItem)
             return DomHandler.hasClass(prevItem, 'ui-state-disabled') || DomHandler.isHidden(prevItem) ? this.findPrevItem(prevItem) : prevItem;
         else
             return null;
-    } 
-    
+    }
+
     getFilteredOptions() {
         let filteredOptions = [];
-        if(this.filterValue) {
+        if (this.filterValue) {
             for (let i = 0; i < this.options.length; i++) {
                 let opt = this.options[i];
                 if (this.isItemVisible(opt) && !opt.disabled) {
@@ -514,6 +534,19 @@ export class Listbox implements AfterContentInit, ControlValueAccessor {
 
     onHeaderCheckboxBlur() {
         this.headerCheckboxFocus = false;
+    }
+
+    setDisabledSelectedOptions(){
+        if (this.options) {
+            this.disabledSelectedOptions = [];
+            if (this.value) {
+                for (let opt of this.options) {
+                    if (opt.disabled && this.isSelected(opt)) {
+                        this.disabledSelectedOptions.push(opt.value);
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -2,7 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { OrderList } from './orderlist';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Button } from '../button/button';
+import { Button } from 'primeng/button';
 import { Component } from '@angular/core';
 
 @Component({
@@ -70,11 +70,11 @@ describe('OrderList', () => {
     });
 
     it('should change listStyle', () => {
-      orderlist.listStyle = {'primeng':'rocks!'};
+      orderlist.listStyle = {'height':'300px'};
       fixture.detectChanges();
 
       const contentEl = fixture.debugElement.query(By.css('ul'));
-      expect(contentEl.nativeElement.style.primeng).toEqual("rocks!");
+      expect(contentEl.nativeElement.style.height).toEqual("300px");
     });
     
     it('should change header', () => {
@@ -295,7 +295,7 @@ describe('OrderList', () => {
       expect(orderlist.visibleOptions[0].brand).toEqual("VW");
       expect(orderlist.visibleOptions[1].brand).toEqual("Volvo");
       for(let i =0; i<itemsEl.length;i++){
-        if(i==0 || i==5)
+        if (i==0 || i==5)
           expect(itemsEl[i].nativeElement.style.display).toEqual("block");
         else
           expect(itemsEl[i].nativeElement.style.display).not.toEqual("block");
@@ -317,7 +317,7 @@ describe('OrderList', () => {
       expect(orderlist.visibleOptions[0].brand).toEqual("VW");
       expect(orderlist.visibleOptions[1].brand).toEqual("Volvo");
       for(let i =0; i<itemsEl.length;i++){
-        if(i==0 || i==5)
+        if (i==0 || i==5)
           expect(itemsEl[i].nativeElement.style.display).toEqual("block");
         else
           expect(itemsEl[i].nativeElement.style.display).not.toEqual("block");

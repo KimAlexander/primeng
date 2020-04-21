@@ -3,10 +3,10 @@ import { By } from '@angular/platform-browser';
 import { Messages } from './messages';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { Button } from '../button/button';
-import { FormsModule } from '../../../../node_modules/@angular/forms';
-import { MessageService } from '../common/messageservice';
-import { Message } from '../common/api';
+import { Button } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
+import { Message } from 'primeng/api';
 
 @Component({
     template: `
@@ -232,7 +232,7 @@ describe('Messages', () => {
         successButton.nativeElement.click();
         fixture.detectChanges();
 
-        const messageEl = fixture.debugElement.queryAll(By.css('.ui-messages'));
+        const messageEl = fixture.debugElement.queryAll(By.css('.ui-messages-icon'));
         expect(messageEl.length).toEqual(2);
     });
 
@@ -264,7 +264,7 @@ describe('Messages', () => {
         clearButton.nativeElement.click();
         fixture.detectChanges();
 
-        const messageEl = fixture.debugElement.queryAll(By.css('.ui-messages'));
+        const messageEl = fixture.debugElement.queryAll(By.css('.ui-messages-icon'));
         expect(messageEl.length).toEqual(1);
     });
 });

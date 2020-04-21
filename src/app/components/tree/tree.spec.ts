@@ -2,23 +2,23 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Tree, UITreeNode } from './tree';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ContextMenu, ContextMenuSub } from '../contextmenu/contextmenu';
+import { ContextMenu, ContextMenuSub } from 'primeng/contextmenu';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
-import { TreeDragDropService } from '../common/api';
+import { TreeDragDropService } from 'primeng/api';
 
 @Component({
 	template: `
 	<p-tree></p-tree>
 	<p-contextMenu #cm [model]="item"></p-contextMenu>
-	<p-tree [value]="filesTree7" draggableNodes="true" droppableNodes="true" droppableScope="files" draggableScope="server2"></p-tree>
-	<p-tree [value]="filesTree8" draggableNodes="true" droppableNodes="true" droppableScope="server1" draggableScope="files"></p-tree>
-	<p-tree [value]="filesTree9" draggableNodes="true" droppableNodes="true" droppableScope="server2" draggableScope="server1"></p-tree>
+	<p-tree class="files" [value]="filesTree7" draggableNodes="true" droppableNodes="true" droppableScope="files" draggableScope="server2"></p-tree>
+	<p-tree class="server1" [value]="filesTree8" draggableNodes="true" droppableNodes="true" droppableScope="server1" draggableScope="files"></p-tree>
+	<p-tree class="server2" [value]="filesTree9" draggableNodes="true" droppableNodes="true" droppableScope="server2" draggableScope="server1"></p-tree>
 	`
   })
   class TestTreeComponent implements OnInit {
 
-	@ViewChild('cm', { static: false }) cm:ElementRef;
+	@ViewChild('cm') cm: ElementRef;
 
 	filesTree7: any;
 
@@ -32,47 +32,47 @@ import { TreeDragDropService } from '../common/api';
 			{
 				"label": "Documents",
 				"data": "Documents Folder",
-				"expandedIcon": "fa fa-folder-open",
-				"collapsedIcon": "fa fa-folder",
+				"expandedIcon": "pi pi-folder-open",
+				"collapsedIcon": "pi pi-folder",
 				"children": [{
 						"label": "Work",
 						"data": "Work Folder",
-						"expandedIcon": "fa fa-folder-open",
-						"collapsedIcon": "fa fa-folder",
-						"children": [{"label": "Expenses.doc", "icon": "fa fa-file-word-o", "data": "Expenses Document"}, {"label": "Resume.doc", "icon": "fa fa-file-word-o", "data": "Resume Document"}]
+						"expandedIcon": "pi pi-folder-open",
+						"collapsedIcon": "pi pi-folder",
+						"children": [{"label": "Expenses.doc", "icon": "pi pi-file-word-o", "data": "Expenses Document"}, {"label": "Resume.doc", "icon": "pi pi-file-word-o", "data": "Resume Document"}]
 					},
 					{
 						"label": "Home",
 						"data": "Home Folder",
-						"expandedIcon": "fa fa-folder-open",
-						"collapsedIcon": "fa fa-folder",
-						"children": [{"label": "Invoices.txt", "icon": "fa fa-file-word-o", "data": "Invoices for this month"}]
+						"expandedIcon": "pi pi-folder-open",
+						"collapsedIcon": "pi pi-folder",
+						"children": [{"label": "Invoices.txt", "icon": "pi pi-file-word-o", "data": "Invoices for this month"}]
 					}]
 			},
 			{
 				"label": "Pictures",
 				"data": "Pictures Folder",
-				"expandedIcon": "fa fa-folder-open",
-				"collapsedIcon": "fa fa-folder",
+				"expandedIcon": "pi pi-folder-open",
+				"collapsedIcon": "pi pi-folder",
 				"children": [
-					{"label": "barcelona.jpg", "icon": "fa fa-file-image-o", "data": "Barcelona Photo"},
-					{"label": "logo.jpg", "icon": "fa fa-file-image-o", "data": "PrimeFaces Logo"},
-					{"label": "primeui.png", "icon": "fa fa-file-image-o", "data": "PrimeUI Logo"}]
+					{"label": "barcelona.jpg", "icon": "pi pi-file-image-o", "data": "Barcelona Photo"},
+					{"label": "logo.jpg", "icon": "pi pi-file-image-o", "data": "PrimeFaces Logo"},
+					{"label": "primeui.png", "icon": "pi pi-file-image-o", "data": "PrimeUI Logo"}]
 			},
 			{
 				"label": "Movies",
 				"data": "Movies Folder",
-				"expandedIcon": "fa fa-folder-open",
-				"collapsedIcon": "fa fa-folder",
+				"expandedIcon": "pi pi-folder-open",
+				"collapsedIcon": "pi pi-folder",
 				"children": [{
 						"label": "Al Pacino",
 						"data": "Pacino Movies",
-						"children": [{"label": "Scarface", "icon": "fa fa-file-video-o", "data": "Scarface Movie"}, {"label": "Serpico", "icon": "fa fa-file-video-o", "data": "Serpico Movie"}]
+						"children": [{"label": "Scarface", "icon": "pi pi-file-video-o", "data": "Scarface Movie"}, {"label": "Serpico", "icon": "pi pi-file-video-o", "data": "Serpico Movie"}]
 					},
 					{
 						"label": "Robert De Niro",
 						"data": "De Niro Movies",
-						"children": [{"label": "Goodfellas", "icon": "fa fa-file-video-o", "data": "Goodfellas Movie"}, {"label": "Untouchables", "icon": "fa fa-file-video-o", "data": "Untouchables Movie"}]
+						"children": [{"label": "Goodfellas", "icon": "pi pi-file-video-o", "data": "Goodfellas Movie"}, {"label": "Untouchables", "icon": "pi pi-file-video-o", "data": "Untouchables Movie"}]
 					}]
 			}
 		];
@@ -81,8 +81,8 @@ import { TreeDragDropService } from '../common/api';
 			{
 				label: "Backup",
 				data: "Backup Folder",
-				expandedIcon: "fa fa-folder-open",
-				collapsedIcon: "fa fa-folder"
+				expandedIcon: "pi pi-folder-open",
+				collapsedIcon: "pi pi-folder"
 			}
 		];
 		
@@ -90,14 +90,14 @@ import { TreeDragDropService } from '../common/api';
 			{
 				label: "Storage",
 				data: "Storage Folder",
-				expandedIcon: "fa fa-folder-open",
-				collapsedIcon: "fa fa-folder"
+				expandedIcon: "pi pi-folder-open",
+				collapsedIcon: "pi pi-folder"
 			}
 		];
 	
 		this.items = [
-			{label: 'View', icon: 'fa fa-search'},
-			{label: 'Unselect', icon: 'fa fa-close'}
+			{label: 'View', icon: 'pi pi-search'},
+			{label: 'Unselect', icon: 'pi pi-close'}
 		];
 	}
 	
@@ -142,47 +142,47 @@ describe('Tree', () => {
 			{
 				"label": "Documents",
 				"data": "Documents Folder",
-				"expandedIcon": "fa fa-folder-open",
-				"collapsedIcon": "fa fa-folder",
+				"expandedIcon": "pi pi-folder-open",
+				"collapsedIcon": "pi pi-folder",
 				"children": [{
 						"label": "Work",
 						"data": "Work Folder",
-						"expandedIcon": "fa fa-folder-open",
-						"collapsedIcon": "fa fa-folder",
-						"children": [{"label": "Expenses.doc", "icon": "fa fa-file-word-o", "data": "Expenses Document"}, {"label": "Resume.doc", "icon": "fa fa-file-word-o", "data": "Resume Document"}]
+						"expandedIcon": "pi pi-folder-open",
+						"collapsedIcon": "pi pi-folder",
+						"children": [{"label": "Expenses.doc", "icon": "pi pi-file-word-o", "data": "Expenses Document"}, {"label": "Resume.doc", "icon": "pi pi-file-word-o", "data": "Resume Document"}]
 					},
 					{
 						"label": "Home",
 						"data": "Home Folder",
-						"expandedIcon": "fa fa-folder-open",
-						"collapsedIcon": "fa fa-folder",
-						"children": [{"label": "Invoices.txt", "icon": "fa fa-file-word-o", "data": "Invoices for this month"}]
+						"expandedIcon": "pi pi-folder-open",
+						"collapsedIcon": "pi pi-folder",
+						"children": [{"label": "Invoices.txt", "icon": "pi pi-file-word-o", "data": "Invoices for this month"}]
 					}]
 			},
 			{
 				"label": "Pictures",
 				"data": "Pictures Folder",
-				"expandedIcon": "fa fa-folder-open",
-				"collapsedIcon": "fa fa-folder",
+				"expandedIcon": "pi pi-folder-open",
+				"collapsedIcon": "pi pi-folder",
 				"children": [
-					{"label": "barcelona.jpg", "icon": "fa fa-file-image-o", "data": "Barcelona Photo"},
-					{"label": "logo.jpg", "icon": "fa fa-file-image-o", "data": "PrimeFaces Logo"},
-					{"label": "primeui.png", "icon": "fa fa-file-image-o", "data": "PrimeUI Logo"}]
+					{"label": "barcelona.jpg", "icon": "pi pi-file-image-o", "data": "Barcelona Photo"},
+					{"label": "logo.jpg", "icon": "pi pi-file-image-o", "data": "PrimeFaces Logo"},
+					{"label": "primeui.png", "icon": "pi pi-file-image-o", "data": "PrimeUI Logo"}]
 			},
 			{
 				"label": "Movies",
 				"data": "Movies Folder",
-				"expandedIcon": "fa fa-folder-open",
-				"collapsedIcon": "fa fa-folder",
+				"expandedIcon": "pi pi-folder-open",
+				"collapsedIcon": "pi pi-folder",
 				"children": [{
 						"label": "Al Pacino",
 						"data": "Pacino Movies",
-						"children": [{"label": "Scarface", "icon": "fa fa-file-video-o", "data": "Scarface Movie"}, {"label": "Serpico", "icon": "fa fa-file-video-o", "data": "Serpico Movie"}]
+						"children": [{"label": "Scarface", "icon": "pi pi-file-video-o", "data": "Scarface Movie"}, {"label": "Serpico", "icon": "pi pi-file-video-o", "data": "Serpico Movie"}]
 					},
 					{
 						"label": "Robert De Niro",
 						"data": "De Niro Movies",
-						"children": [{"label": "Goodfellas", "icon": "fa fa-file-video-o", "data": "Goodfellas Movie"}, {"label": "Untouchables", "icon": "fa fa-file-video-o", "data": "Untouchables Movie"}]
+						"children": [{"label": "Goodfellas", "icon": "pi pi-file-video-o", "data": "Goodfellas Movie"}, {"label": "Untouchables", "icon": "pi pi-file-video-o", "data": "Untouchables Movie"}]
 					}]
 			}
 		];
@@ -481,6 +481,7 @@ describe('Tree', () => {
 		const documentsContentEl = fileTreeContentEls[0];
 		const onDragStartSpy = spyOn(documentsContentEl.componentInstance,"onDragStart").and.callThrough();
 		const startDragSpy = spyOn(filesTree.dragDropService,"startDrag").and.callThrough();
+		const onDropSpy = spyOn(server2Tree,"onDrop").and.callThrough();
 		documentsContentEl.triggerEventHandler("dragstart",{dataTransfer:new DataTransfer});
 		fixture.detectChanges();
 		
@@ -510,6 +511,7 @@ describe('Tree', () => {
 		server2DropPoints[1].triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
 		let dropEvent;
 		server2Tree.onNodeDrop.subscribe((event) => {dropEvent = event});
+		server2TreeEl.triggerEventHandler("drop",{preventDefault(){}});
 		server2DropPoints[1].triggerEventHandler("drop",{preventDefault(){}});
 		fixture.detectChanges();
 
@@ -518,5 +520,96 @@ describe('Tree', () => {
 		expect(dropEvent.dragNode.label).toEqual("Documents");
 		expect(dropEvent.dropNode.label).toEqual("Storage");
 		expect(dropEvent.dropIndex).toEqual(0);
+		expect(onDropSpy).toHaveBeenCalled();
+	});
+
+	it('should drop item to inside of node', () => {
+		fixture.detectChanges();
+
+		let fileTreeContentEls = fixture.debugElement.children[2].queryAll(By.css('.ui-treenode-content'));
+		expect(fileTreeContentEls.length).toEqual(3);
+		const documentsContentEl = fileTreeContentEls[0];
+		const onDragStartSpy = spyOn(documentsContentEl.componentInstance,"onDragStart").and.callThrough();
+		const startDragSpy = spyOn(filesTree.dragDropService,"startDrag").and.callThrough();
+		documentsContentEl.triggerEventHandler("dragstart",{dataTransfer:new DataTransfer});
+		fixture.detectChanges();
+		
+		expect(onDragStartSpy).toHaveBeenCalled();
+		expect(startDragSpy).toHaveBeenCalled();
+		expect(documentsContentEl.componentInstance).toEqual(filesTree.dragNodeTree);
+		expect(filesTree.dragNode.label).toEqual("Documents");
+		expect(filesTree.dragNodeIndex).toEqual(0);
+		const picturesContentEl = fileTreeContentEls[1];
+		picturesContentEl.triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		picturesContentEl.triggerEventHandler("dragleave",{currentTarget:picturesContentEl.nativeElement});
+		const fileTreeEl = fixture.debugElement.children[2].query(By.css('div'));
+		const server2TreeEl = fixture.debugElement.children[4].query(By.css('div'));
+		const onDragLeaveSpy =spyOn(filesTree,"onDragLeave").and.callThrough();
+		const onDragEnterSpy =spyOn(server2Tree,"onDragEnter").and.callThrough();
+		fileTreeEl.triggerEventHandler("dragleave",{currentTarget:fileTreeEl.nativeElement});
+		expect(onDragLeaveSpy).toHaveBeenCalled();
+		server2TreeEl.triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		expect(onDragEnterSpy).toHaveBeenCalled();
+		const server2DropPoints = server2TreeEl.queryAll(By.css('.ui-treenode-droppoint'));
+		const serverContentEl = server2TreeEl.query(By.css('.ui-treenode-content'));
+		expect(server2DropPoints.length).toEqual(2);
+		server2DropPoints[0].triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		server2DropPoints[0].triggerEventHandler("dragleave",{currentTarget:fileTreeEl.nativeElement});
+		serverContentEl.triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		serverContentEl.triggerEventHandler("dragleave",{currentTarget:fileTreeEl.nativeElement});
+		server2DropPoints[1].triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		server2DropPoints[1].triggerEventHandler("dragleave",{dataTransfer:new DataTransfer});
+		serverContentEl.triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		serverContentEl.triggerEventHandler("dragover",{dataTransfer:new DataTransfer,preventDefault(){},stopPropagation(){}});
+		let dropEvent;
+		server2Tree.onNodeDrop.subscribe((event) => {dropEvent = event});
+		serverContentEl.triggerEventHandler("drop",{preventDefault(){},stopPropagation(){}});
+		serverContentEl.triggerEventHandler("dragend",{dataTransfer:new DataTransfer,preventDefault(){},stopPropagation(){}});
+		fixture.detectChanges();
+
+		fileTreeContentEls = fixture.debugElement.children[2].queryAll(By.css('.ui-treenode-content'));
+		expect(fileTreeContentEls.length).toEqual(2);
+		expect(dropEvent.dragNode.label).toEqual("Documents");
+		expect(dropEvent.dropNode.label).toEqual("Storage");
+	});
+
+	it('should drop item from files to server2(empty)', () => {
+		fixture.detectChanges();
+
+		server2Tree.value = [];
+		let fileTreeContentEls = fixture.debugElement.children[2].queryAll(By.css('.ui-treenode-content'));
+		expect(fileTreeContentEls.length).toEqual(3);
+		const documentsContentEl = fileTreeContentEls[0];
+		const onDragStartSpy = spyOn(documentsContentEl.componentInstance,"onDragStart").and.callThrough();
+		const startDragSpy = spyOn(filesTree.dragDropService,"startDrag").and.callThrough();
+		const onDropSpy = spyOn(server2Tree,"onDrop").and.callThrough();
+		documentsContentEl.triggerEventHandler("dragstart",{dataTransfer:new DataTransfer});
+		fixture.detectChanges();
+		
+		expect(onDragStartSpy).toHaveBeenCalled();
+		expect(startDragSpy).toHaveBeenCalled();
+		expect(documentsContentEl.componentInstance).toEqual(filesTree.dragNodeTree);
+		expect(filesTree.dragNode.label).toEqual("Documents");
+		expect(filesTree.dragNodeIndex).toEqual(0);
+		const picturesContentEl = fileTreeContentEls[1];
+		picturesContentEl.triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		picturesContentEl.triggerEventHandler("dragleave",{currentTarget:picturesContentEl.nativeElement});
+		const fileTreeEl = fixture.debugElement.children[2].query(By.css('div'));
+		const server2TreeEl = fixture.debugElement.children[4].query(By.css('div'));
+		const onDragLeaveSpy =spyOn(filesTree,"onDragLeave").and.callThrough();
+		const onDragEnterSpy =spyOn(server2Tree,"onDragEnter").and.callThrough();
+		fileTreeEl.triggerEventHandler("dragleave",{currentTarget:fileTreeEl.nativeElement});
+		expect(onDragLeaveSpy).toHaveBeenCalled();
+		server2TreeEl.triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		expect(onDragEnterSpy).toHaveBeenCalled();
+		server2TreeEl.triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		server2TreeEl.triggerEventHandler("dragleave",{currentTarget:fileTreeEl.nativeElement});
+		server2TreeEl.triggerEventHandler("dragenter",{dataTransfer:new DataTransfer});
+		server2TreeEl.triggerEventHandler("drop",{preventDefault(){}});
+		fixture.detectChanges();
+
+		fileTreeContentEls = fixture.debugElement.children[2].queryAll(By.css('.ui-treenode-content'));
+		expect(fileTreeContentEls.length).toEqual(2);
+		expect(onDropSpy).toHaveBeenCalled();
 	});
 });

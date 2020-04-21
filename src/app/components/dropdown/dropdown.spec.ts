@@ -1,21 +1,25 @@
-import {ScrollingModule} from '@angular/cdk/scrolling';
-import { TestBed, ComponentFixture, tick, fakeAsync, async } from '@angular/core/testing';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import {Dropdown, DropdownItem} from './dropdown';
+import { Dropdown, DropdownItem} from './dropdown';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '../../../../node_modules/@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
 	template: `
-		<p-dropdown [options]="groupedCars" placeholder="Select a Car" [group]="true">
+		<p-dropdown [(ngModel)]="selectedCity" [options]="groupedCars" placeholder="Select a Car" [group]="true">
 			<ng-template let-group pTemplate="group">
 				<span>{{group.label}}</span>
 			</ng-template>
 		</p-dropdown>
+		<p-dropdown [(ngModel)]="selectedCity"></p-dropdown>
+		<button (click)="setValue()"></button>
 	`
 })
 class TestDropdownComponent {
+	selectedCity: any;
 	groupedCars = [
 		{
 			label: 'Germany', value: 'germany.png', 
@@ -42,10 +46,15 @@ class TestDropdownComponent {
 			]
 		}
 	];
+
+	setValue() {
+		this.selectedCity = {name: 'New York', code: 'NY'};
+	}
 }
 describe('Dropdown', () => {
     
     let dropdown: Dropdown;
+    let testDropdown: Dropdown;
     let groupDropdown: Dropdown;
 	let fixture: ComponentFixture<Dropdown>;
 	let groupFixture: ComponentFixture<TestDropdownComponent>;
@@ -55,7 +64,8 @@ describe('Dropdown', () => {
         imports: [
           NoopAnimationsModule,
           FormsModule,
-          ScrollingModule
+		  ScrollingModule,
+		  TooltipModule
         ],
         declarations: [
           Dropdown,
@@ -67,6 +77,7 @@ describe('Dropdown', () => {
 	  fixture = TestBed.createComponent(Dropdown);
 	  groupFixture = TestBed.createComponent(TestDropdownComponent);
 	  groupDropdown = groupFixture.debugElement.children[0].componentInstance;
+	  testDropdown = groupFixture.debugElement.children[1].componentInstance;
       dropdown = fixture.componentInstance;
     });
 
@@ -93,12 +104,12 @@ describe('Dropdown', () => {
 
 	it('should change style and styleClass', () => {
 		dropdown.styleClass = "Primeng";
-		dropdown.style = {'primeng':'rocks'}
+		dropdown.style = {'height':'300px'}
 		fixture.detectChanges();
 
 		const containerEl = fixture.debugElement.query(By.css('.ui-dropdown'));
 		expect(containerEl.nativeElement.className).toContain("Primeng");
-		expect(containerEl.nativeElement.style.primeng).toEqual("rocks");
+		expect(containerEl.nativeElement.style.height).toEqual("300px");
 	});
 
 	it('should change panelStyleClass', () => {
@@ -211,6 +222,10 @@ describe('Dropdown', () => {
 	});
 
 	it('should filtered', async(() => {
+		dropdown.filter = true;
+		dropdown.filterValue = "n";
+		fixture.detectChanges();
+
 		dropdown.options = [
 			{label: 'New York', code: 'NY'},
 			{label: 'Rome', code: 'RM'},
@@ -218,13 +233,14 @@ describe('Dropdown', () => {
 			{label: 'Istanbul', code: 'IST'},
 			{label: 'Paris', code: 'PRS'}
 		];
-		dropdown.filter = true;
 		fixture.detectChanges();
 		
 		const container = fixture.debugElement.query(By.css('.ui-dropdown')).nativeElement;
 		container.click();
 		fixture.detectChanges();
 
+		let items=fixture.debugElement.query(By.css('.ui-dropdown-items'));
+		expect(items.nativeElement.children.length).toEqual(3);
 		const filterDiv = fixture.debugElement.query(By.css('.ui-dropdown-filter-container'));
 		expect(filterDiv).toBeTruthy();
 		const filterInputEl = fixture.debugElement.query(By.css('.ui-dropdown-filter'));
@@ -234,7 +250,7 @@ describe('Dropdown', () => {
 		dropdown.onFilter(event)
 		fixture.detectChanges();
 
-		const items=fixture.debugElement.query(By.css('.ui-dropdown-items'));
+		items=fixture.debugElement.query(By.css('.ui-dropdown-items'));
 		expect(items.nativeElement.children.length).toEqual(3);
 	}));
 
@@ -325,29 +341,37 @@ describe('Dropdown', () => {
 	});
 
 	it('should select with down key', () => {
-		dropdown.options = [
+		groupFixture.detectChanges();
+
+		testDropdown.options = [
 			{name: 'New York', code: 'NY'},
 			{name: 'Rome', code: 'RM'},
 			{name: 'London', code: 'LDN'},
 			{name: 'Istanbul', code: 'IST'},
 			{name: 'Paris', code: 'PRS'}
 		];
-		dropdown.appendTo = document.body;
-		fixture.detectChanges();
+		testDropdown.appendTo = document.body;
+		testDropdown.filter = true;
+		testDropdown.filterValue = "n";
+		groupFixture.detectChanges();
+
+		groupFixture.debugElement.children[2].nativeElement.click();
+		groupFixture.detectChanges();
 		
-		const inputEl = fixture.debugElement.query(By.css('input')).nativeElement;
+		expect(testDropdown.selectedOption.name).toEqual("New York");
+		const inputEl = groupFixture.debugElement.children[1].query(By.css('input')).nativeElement;
 		const keydownEvent: any = document.createEvent('CustomEvent');
         keydownEvent.which = 40;
 		keydownEvent.initEvent('keydown', true, true);
 		keydownEvent.altKey = true;
 		inputEl.dispatchEvent(keydownEvent);
-		fixture.detectChanges();
+		groupFixture.detectChanges();
 
 		keydownEvent.altKey = false;
 		inputEl.dispatchEvent(keydownEvent);
-		fixture.detectChanges();
+		groupFixture.detectChanges();
 
-		expect(dropdown.selectedOption.name).toEqual("Rome");
+		expect(testDropdown.selectedOption.name).toEqual("Rome");
 	});
 
 	it('should select with enter key and close the overlay', () => {
@@ -416,6 +440,7 @@ describe('Dropdown', () => {
 
 		keydownEvent.which = 76;
 		keydownEvent.keyCode = 76;
+		keydownEvent.key = "l";
 		inputEl.dispatchEvent(keydownEvent);
 		fixture.detectChanges();
 
@@ -485,6 +510,7 @@ describe('Dropdown', () => {
 
 		keydownEvent.which = 77;
 		keydownEvent.keyCode = 77;
+		keydownEvent.key = "m";
 		keydownEvent.altKey = false;
 		inputEl.dispatchEvent(keydownEvent);
 

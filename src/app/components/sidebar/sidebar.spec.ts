@@ -10,7 +10,7 @@ import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
   <button type="button" (click)="visibleSidebar1 = false" label="Save" class="ui-button-success"></button>
   <button type="button" (click)="visibleSidebar1 = false" label="Cancel" class="ui-button-secondary"></button>
   </p-sidebar>
-  <button type="button" (click)="visibleSidebar1 = true" icon="pi pi-arrow-right"></button>`
+  <button type="button" (click)="visibleSidebar1 = true"></button>`
 })
 class TestSideBarComponent {
   visibleSidebar1;
@@ -38,13 +38,13 @@ describe('Sidebar', () => {
     });
   
     it('should change style and styleClass', () => {
-      sidebar.style = {'primeng':'rocks!'};
+      sidebar.style = {'height':'300px'};
       sidebar.styleClass = "Primeng rocks!";
       fixture.detectChanges();
 
       const containerEl = fixture.debugElement.query(By.css('div')).nativeElement;
       expect(containerEl.className).toContain("Primeng rocks!");
-      expect(containerEl.style.primeng).toContain('rocks!')
+      expect(containerEl.style.height).toContain('300px')
     });
 
     it('should not show icon', () => {

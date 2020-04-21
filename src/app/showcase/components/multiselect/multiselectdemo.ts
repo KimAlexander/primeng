@@ -1,9 +1,13 @@
 import {Component} from '@angular/core';
-import {SelectItem} from '../../../components/common/api';
+import {SelectItem} from 'primeng/api';
 
 @Component({
     templateUrl: './multiselectdemo.html',
     styles: [`
+        :host ::ng-deep .ui-multiselect {
+            min-width: 15em;
+        }
+
         :host ::ng-deep .ui-multiselected-item-token,
         :host ::ng-deep .ui-multiselected-empty-token {
             padding: 2px 4px;

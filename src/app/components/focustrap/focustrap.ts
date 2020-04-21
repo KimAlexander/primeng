@@ -1,21 +1,22 @@
-import {NgModule,Directive,ElementRef,HostListener} from '@angular/core';
+import {NgModule,Directive,ElementRef,HostListener, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {DomHandler} from '../dom/domhandler';
+import {DomHandler} from 'primeng/dom';
 
 @Directive({
     selector: '[pFocusTrap]',
 })
 export class FocusTrap {
 
+    @Input() pFocusTrapDisabled: boolean;
+
     constructor(public el: ElementRef) {}
 
-    @HostListener('keydown', ['$event']) 
+    @HostListener('keydown.tab', ['$event'])
+    @HostListener('keydown.shift.tab', ['$event'])
     onkeydown(e) {
-        if(e.which === 9) {
-            event.preventDefault();
-            
+        if (this.pFocusTrapDisabled !== true) {
+            e.preventDefault();
             let focusableElements = DomHandler.getFocusableElements(this.el.nativeElement);
-
             if (focusableElements && focusableElements.length > 0) {
                 if (!document.activeElement) {
                     focusableElements[0].focus();

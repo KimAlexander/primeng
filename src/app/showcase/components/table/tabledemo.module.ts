@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableDemo } from './tabledemo';
+import { TableBasicDemo } from './tablebasicdemo';
+import { TableDynamicDemo } from './tabledynamicdemo';
 import { TablePageDemo } from './tablepagedemo';
 import { TableSortDemo } from './tablesortdemo';
 import { TableSelectionDemo } from './tableselectiondemo';
@@ -11,16 +13,6 @@ import { TableSubmenu } from './tablesubmenu';
 import { TableStyleDemo } from './tablestyledemo';
 import { TableLazyDemo } from './tablelazydemo';
 import { TableExportDemo } from './tableexportdemo';
-import { TableDemoRoutingModule } from './tabledemo-routing.module';
-import { TableModule } from '../../../components/table/table';
-import { SliderModule } from '../../../components/slider/slider';
-import { MultiSelectModule } from '../../../components/multiselect/multiselect';
-import { ContextMenuModule } from '../../../components/contextmenu/contextmenu';
-import { ToastModule } from '../../../components/toast/toast';
-import { ButtonModule } from '../../../components/button/button';
-import { DialogModule } from '../../../components/dialog/dialog';
-import { DropdownModule } from '../../../components/dropdown/dropdown';
-import { InputTextModule } from '../../../components/inputtext/inputtext';
 import { TableColGroupDemo } from './tablecolgroupdemo';
 import { TableRowExpansionDemo } from './tablerowexpansiondemo';
 import { TableScrollDemo } from './tablescrolldemo';
@@ -34,15 +26,28 @@ import { TableEditDemo } from './tableeditdemo';
 import { TableStateDemo } from './tablestatedemo';
 import { TableStickyDemo } from './tablestickydemo';
 import { TableRowGroupDemo } from './tablerowgroupdemo';
-import { TabViewModule } from '../../../components/tabview/tabview';
-import { CodeHighlighterModule } from '../../../components/codehighlighter/codehighlighter';
+import { TableDemoRoutingModule } from './tabledemo-routing.module';
+import { TableModule } from 'primeng/table';
+import { SliderModule } from 'primeng/slider';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { ToastModule } from 'primeng/toast';
+import { ButtonModule } from 'primeng/button';
+import { CalendarModule } from 'primeng/calendar';
+import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputTextModule } from 'primeng/inputtext';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { TabViewModule } from 'primeng/tabview';
+import { CodeHighlighterModule } from 'primeng/codehighlighter';
 
 @NgModule({
 	imports: [
 		CommonModule,
 		FormsModule,
 		TableDemoRoutingModule,
-		TableModule,
+        TableModule,
+        CalendarModule,
 		SliderModule,
 		DialogModule,
 		MultiSelectModule,
@@ -50,13 +55,16 @@ import { CodeHighlighterModule } from '../../../components/codehighlighter/codeh
 		DropdownModule,
 		ButtonModule,
 		ToastModule,
-		InputTextModule,
+        InputTextModule,
+        ProgressBarModule,
 		TabViewModule,
 		CodeHighlighterModule
 	],
 	declarations: [
 		TableSubmenu,
 		TableDemo,
+		TableBasicDemo,
+		TableDynamicDemo,
 		TablePageDemo,
 		TableSortDemo,
 		TableSelectionDemo,
