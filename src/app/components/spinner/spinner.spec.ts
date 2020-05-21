@@ -174,6 +174,8 @@ describe('Spinner', () => {
     });
 
     it('should select with up and down arrows', () => {
+        fixture.detectChanges();
+
         let upArrowEvent = {'which': 38,preventDefault(){}};
         let downArrowEvent = {'which': 40,preventDefault(){}};
         spinner.onInputKeydown(upArrowEvent as KeyboardEvent);
@@ -187,13 +189,13 @@ describe('Spinner', () => {
     });
 
     it('should change inputStyle and inputStyleClass', () => {
-        spinner.inputStyle = {'primeng': 'rocks!'};
+        spinner.inputStyle = {'height': '300px'};
         spinner.inputStyleClass = "Primeng ROCKS!";
         fixture.detectChanges();
 
         const inputEl = fixture.debugElement.query(By.css('input'));
         expect(inputEl.nativeElement.className).toContain("Primeng ROCKS!");
-        expect(inputEl.nativeElement.style.primeng).toEqual("rocks!");
+        expect(inputEl.nativeElement.style.height).toEqual("300px");
     });
 
     it('should change inputId placeholder tabindex and required', () => {
@@ -251,5 +253,19 @@ describe('Spinner', () => {
         expect(onChangeData).toBeTruthy();
         expect(onFocusData).toBeTruthy();
         expect(onBlurData).toBeTruthy();
+    });
+
+    it('should format input', () => {
+        spinner.thousandSeparator = ",";
+        spinner.decimalSeparator = ".";
+        spinner.formatInput = true;
+        spinner.step = 0.25;
+        spinner.value= "10000";
+        fixture.detectChanges();
+       
+        spinner.writeValue(10000000);
+        fixture.detectChanges();
+
+        expect(spinner.formattedValue).toEqual("10,000,000");
     });
 });

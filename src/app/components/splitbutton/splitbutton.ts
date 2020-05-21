@@ -1,11 +1,12 @@
-import {NgModule,Component,ElementRef,OnDestroy,Input,Output,ContentChildren,EventEmitter,QueryList,Renderer2,ChangeDetectorRef,ViewChild} from '@angular/core';
+import {NgModule,Component,ElementRef,OnDestroy,Input,Output,EventEmitter,Renderer2,ChangeDetectorRef,ViewChild,ChangeDetectionStrategy} from '@angular/core';
 import {trigger,state,style,transition,animate,AnimationEvent} from '@angular/animations';
 import {CommonModule} from '@angular/common';
-import {DomHandler} from '../dom/domhandler';
-import {MenuItem} from '../common/menuitem';
-import {ButtonModule} from '../button/button';
+import {DomHandler} from 'primeng/dom';
+import {MenuItem} from 'primeng/api';
+import {ButtonModule} from 'primeng/button';
 import {Router} from '@angular/router';
 import {RouterModule} from '@angular/router';
+import { UniqueComponentId } from 'primeng/utils';
 
 @Component({
     selector: 'p-splitButton',
@@ -13,13 +14,14 @@ import {RouterModule} from '@angular/router';
         <div #container [ngClass]="{'ui-splitbutton ui-buttonset ui-widget':true,'ui-state-disabled':disabled}" [ngStyle]="style" [class]="styleClass">
             <button #defaultbtn type="button" pButton [icon]="icon" [iconPos]="iconPos" [label]="label" [cornerStyleClass]="dir === 'rtl' ? 'ui-corner-right': 'ui-corner-left'" (click)="onDefaultButtonClick($event)" [disabled]="disabled" [attr.tabindex]="tabindex">
             </button><button type="button" pButton class="ui-splitbutton-menubutton" icon="pi pi-chevron-down" [cornerStyleClass]="dir === 'rtl' ? 'ui-corner-left': 'ui-corner-right'" (click)="onDropdownButtonClick($event)" [disabled]="disabled"></button>
-            <div #overlay [ngClass]="'ui-menu ui-menu-dynamic ui-widget ui-widget-content ui-corner-all ui-helper-clearfix ui-shadow'" *ngIf="overlayVisible"
+            <div [attr.id]="ariaId + '_overlay'" #overlay [ngClass]="'ui-menu ui-menu-dynamic ui-widget ui-widget-content ui-corner-all ui-helper-clearfix ui-shadow'" *ngIf="overlayVisible"
                     [ngStyle]="menuStyle" [class]="menuStyleClass"
                     [@overlayAnimation]="{value: 'visible', params: {showTransitionParams: showTransitionOptions, hideTransitionParams: hideTransitionOptions}}" (@overlayAnimation.start)="onOverlayAnimationStart($event)">
-                <ul class="ui-menu-list ui-helper-reset">
+                <ul class="ui-menu-list ui-helper-reset" role="menu">
                     <ng-template ngFor let-item [ngForOf]="model">
-                        <li class="ui-menuitem ui-widget ui-corner-all" role="menuitem" *ngIf="item.visible !== false">
-                            <a *ngIf="!item.routerLink" [attr.href]="item.url" class="ui-menuitem-link ui-corner-all" [attr.target]="item.target"
+                        <li *ngIf="item.separator" class="ui-menu-separator ui-widget-content" [ngClass]="{'ui-helper-hidden': item.visible === false}" role="separator">
+                        <li class="ui-menuitem ui-widget ui-corner-all" role="menuitem" *ngIf="item.visible !== false && !item.separator" role="none">
+                            <a *ngIf="!item.routerLink" [attr.href]="item.url" class="ui-menuitem-link ui-corner-all" [attr.target]="item.target" role="menuitem"
                                 [ngClass]="{'ui-state-disabled':item.disabled}" (click)="itemClick($event, item)">
                                 <span [ngClass]="'ui-menuitem-icon'" [class]="item.icon" *ngIf="item.icon"></span>
                                 <span class="ui-menuitem-text">{{item.label}}</span>
@@ -48,7 +50,8 @@ import {RouterModule} from '@angular/router';
             transition('void => visible', animate('{{showTransitionParams}}')),
             transition('visible => void', animate('{{hideTransitionParams}}'))
         ])
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class SplitButton implements OnDestroy {
 
@@ -84,9 +87,9 @@ export class SplitButton implements OnDestroy {
 
     @Input() hideTransitionOptions: string = '195ms ease-in';
 
-    @ViewChild('container', { static: false }) containerViewChild: ElementRef;
+    @ViewChild('container') containerViewChild: ElementRef;
     
-    @ViewChild('defaultbtn', { static: false }) buttonViewChild: ElementRef;
+    @ViewChild('defaultbtn') buttonViewChild: ElementRef;
 
     overlay: HTMLDivElement;
                     
@@ -98,25 +101,29 @@ export class SplitButton implements OnDestroy {
     
     public shown: boolean;
 
+    ariaId: string;
+
     documentResizeListener: any;
 
-    constructor(public el: ElementRef, public renderer: Renderer2, public router: Router, public cd: ChangeDetectorRef) {}
+    constructor(public el: ElementRef, public renderer: Renderer2, public router: Router, public cd: ChangeDetectorRef) {
+        this.ariaId = UniqueComponentId() + '_list';
+    }
                 
     onDefaultButtonClick(event: Event) {
         this.onClick.emit(event);
     }
     
     itemClick(event: Event, item: MenuItem) {
-        if(item.disabled) {
+        if (item.disabled) {
             event.preventDefault();
             return;
         }
         
-        if(!item.url) {
+        if (!item.url) {
             event.preventDefault();
         }
         
-        if(item.command) {            
+        if (item.command) {            
             item.command({
                 originalEvent: event,
                 item: item
@@ -154,7 +161,7 @@ export class SplitButton implements OnDestroy {
     }
 
     alignOverlay() {
-        if(this.appendTo)
+        if (this.appendTo)
             DomHandler.absolutePosition(this.overlay, this.containerViewChild.nativeElement);
         else
             DomHandler.relativePosition(this.overlay, this.containerViewChild.nativeElement);
@@ -167,7 +174,9 @@ export class SplitButton implements OnDestroy {
             else
                 DomHandler.appendChild(this.overlay, this.appendTo);
 
-            this.overlay.style.minWidth = DomHandler.getWidth(this.el.nativeElement.children[0]) + 'px';
+            if (!this.overlay.style.minWidth) {
+                this.overlay.style.minWidth = DomHandler.getWidth(this.el.nativeElement.children[0]) + 'px';
+            }
         }
     }
 
@@ -178,9 +187,9 @@ export class SplitButton implements OnDestroy {
     }
     
     bindDocumentClickListener() {
-        if(!this.documentClickListener) {
+        if (!this.documentClickListener) {
             this.documentClickListener = this.renderer.listen('document', 'click', () => {
-                if(this.dropdownClick) {
+                if (this.dropdownClick) {
                     this.dropdownClick = false;
                 }
                 else {
@@ -193,7 +202,7 @@ export class SplitButton implements OnDestroy {
     }
     
     unbindDocumentClickListener() {
-        if(this.documentClickListener) {
+        if (this.documentClickListener) {
             this.documentClickListener();
             this.documentClickListener = null;
         }

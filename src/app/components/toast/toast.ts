@@ -1,25 +1,25 @@
-import {NgModule,Component,Input,Output,OnInit,AfterViewInit,AfterContentInit,OnDestroy,ElementRef,ViewChild,EventEmitter,ContentChildren,QueryList,TemplateRef} from '@angular/core';
+import {NgModule,Component,Input,Output,OnInit,AfterViewInit,AfterContentInit,OnDestroy,ElementRef,ViewChild,EventEmitter,ContentChildren,QueryList,TemplateRef,ChangeDetectionStrategy, NgZone, ChangeDetectorRef} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Message} from '../common/message';
-import {DomHandler} from '../dom/domhandler';
-import {PrimeTemplate,SharedModule} from '../common/shared';
-import {MessageService} from '../common/messageservice';
+import {Message} from 'primeng/api';
+import {DomHandler} from 'primeng/dom';
+import {PrimeTemplate,SharedModule} from 'primeng/api';
+import {MessageService} from 'primeng/api';
 import {Subscription} from 'rxjs';
 import {trigger,state,style,transition,animate,query,animateChild,AnimationEvent} from '@angular/animations';
 
 @Component({
     selector: 'p-toastItem',
     template: `
-        <div #container class="ui-toast-message ui-shadow" [@messageState]="{value: 'visible', params: {showTransitionParams: showTransitionOptions, hideTransitionParams: hideTransitionOptions}}"
+        <div #container [attr.id]="message.id" class="ui-toast-message ui-shadow" [@messageState]="{value: 'visible', params: {showTransformParams: showTransformOptions, hideTransformParams: hideTransformOptions, showTransitionParams: showTransitionOptions, hideTransitionParams: hideTransitionOptions}}"
             [ngClass]="{'ui-toast-message-info': message.severity == 'info','ui-toast-message-warn': message.severity == 'warn',
                 'ui-toast-message-error': message.severity == 'error','ui-toast-message-success': message.severity == 'success'}"
-                (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+                (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="ui-toast-message-content">
                 <a tabindex="0" class="ui-toast-close-icon pi pi-times" (click)="onCloseIconClick($event)" (keydown.enter)="onCloseIconClick($event)" *ngIf="message.closable !== false"></a>
                 <ng-container *ngIf="!template">
                     <span class="ui-toast-icon pi"
                         [ngClass]="{'pi-info-circle': message.severity == 'info', 'pi-exclamation-triangle': message.severity == 'warn',
-                            'pi-times': message.severity == 'error', 'pi-check' :message.severity == 'success'}"></span>
+                            'pi-times-circle': message.severity == 'error', 'pi-check' :message.severity == 'success'}"></span>
                     <div class="ui-toast-message-text-content">
                         <div class="ui-toast-summary">{{message.summary}}</div>
                         <div class="ui-toast-detail">{{message.detail}}</div>
@@ -36,14 +36,14 @@ import {trigger,state,style,transition,animate,query,animateChild,AnimationEvent
                 opacity: 1
             })),
             transition('void => *', [
-                style({transform: 'translateY(100%)', opacity: 0}),
+                style({transform: '{{showTransformParams}}', opacity: 0}),
                 animate('{{showTransitionParams}}')
             ]),
             transition('* => void', [
                 animate(('{{hideTransitionParams}}'), style({
                     height: 0,
                     opacity: 0,
-                    transform: 'translateY(-100%)'
+                    transform: '{{hideTransformParams}}'
                 }))
             ])
         ])
@@ -57,28 +57,36 @@ export class ToastItem implements AfterViewInit, OnDestroy {
 
     @Input() template: TemplateRef<any>;
 
+    @Input() showTransformOptions: string;
+
+    @Input() hideTransformOptions: string;
+
     @Input() showTransitionOptions: string;
 
     @Input() hideTransitionOptions: string;
 
     @Output() onClose: EventEmitter<any> = new EventEmitter();
 
-    @ViewChild('container', { static: false }) containerViewChild: ElementRef;
+    @ViewChild('container') containerViewChild: ElementRef;
 
     timeout: any;
 
+    constructor(private zone: NgZone) {}
+    
     ngAfterViewInit() {
         this.initTimeout();
     }
 
     initTimeout() {
         if (!this.message.sticky) {
-            this.timeout = setTimeout(() => {
-                this.onClose.emit({
-                    index: this.index,
-                    message: this.message
-                });
-            }, this.message.life || 3000);
+            this.zone.runOutsideAngular(() => {
+                this.timeout = setTimeout(() => {
+                    this.onClose.emit({
+                        index: this.index,
+                        message: this.message
+                    });
+                }, this.message.life || 3000);
+            });
         }
     }
 
@@ -126,7 +134,9 @@ export class ToastItem implements AfterViewInit, OnDestroy {
                 'ui-toast-center': position === 'center'}" 
                 [ngStyle]="style" [class]="styleClass">
             <p-toastItem *ngFor="let msg of messages; let i=index" [message]="msg" [index]="i" (onClose)="onMessageClose($event)"
-                    [template]="template" @toastAnimation (@toastAnimation.start)="onAnimationStart($event)" [showTransitionOptions]="showTransitionOptions" [hideTransitionOptions]="hideTransitionOptions"></p-toastItem>
+                    [template]="template" @toastAnimation (@toastAnimation.start)="onAnimationStart($event)" 
+                    [showTransformOptions]="showTransformOptions" [hideTransformOptions]="hideTransformOptions" 
+                    [showTransitionOptions]="showTransitionOptions" [hideTransitionOptions]="hideTransitionOptions"></p-toastItem>
         </div>
     `,
     animations: [
@@ -135,7 +145,8 @@ export class ToastItem implements AfterViewInit, OnDestroy {
                 query('@*', animateChild())
             ])
         ])
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class Toast implements OnInit,AfterContentInit,OnDestroy {
 
@@ -152,14 +163,22 @@ export class Toast implements OnInit,AfterContentInit,OnDestroy {
     @Input() position: string = 'top-right';
 
     @Input() modal: boolean;
+
+    @Input() preventOpenDuplicates: boolean = false;
+
+    @Input() preventDuplicates: boolean = false;
     
+    @Input() showTransformOptions: string = 'translateY(100%)';
+
+    @Input() hideTransformOptions: string = 'translateY(-100%)';
+
     @Input() showTransitionOptions: string = '300ms ease-out';
 
     @Input() hideTransitionOptions: string = '250ms ease-in';
 
     @Output() onClose: EventEmitter<any> = new EventEmitter();
 
-    @ViewChild('container', { static: false }) containerViewChild: ElementRef;
+    @ViewChild('container') containerViewChild: ElementRef;
 
     @ContentChildren(PrimeTemplate) templates: QueryList<any>;
 
@@ -169,21 +188,23 @@ export class Toast implements OnInit,AfterContentInit,OnDestroy {
 
     messages: Message[];
 
+    messagesArchieve: Message[];
+
     template: TemplateRef<any>;
 
     mask: HTMLDivElement;
     
-    constructor(public messageService: MessageService) {}
+    constructor(public messageService: MessageService, private cd: ChangeDetectorRef) {}
 
     ngOnInit() {
         this.messageSubscription = this.messageService.messageObserver.subscribe(messages => {
             if (messages) {
                 if (messages instanceof Array) {
-                    let filteredMessages = messages.filter(m => this.key === m.key);
-                    this.messages = this.messages ? [...this.messages, ...filteredMessages] : [...filteredMessages];
+                    const filteredMessages = messages.filter(m => this.canAdd(m));
+                    this.add(filteredMessages);
                 }
-                else if (this.key === messages.key) {
-                    this.messages = this.messages ? [...this.messages, ...[messages]] : [messages];
+                else if (this.canAdd(messages)) {
+                    this.add([messages]);
                 }
 
                 if (this.modal && this.messages && this.messages.length) {
@@ -206,6 +227,38 @@ export class Toast implements OnInit,AfterContentInit,OnDestroy {
                 this.disableModality();
             }
         });       
+    }
+
+    add(messages: Message[]): void {
+        this.messages = this.messages ? [...this.messages, ...messages] : [...messages];
+
+        if (this.preventDuplicates) {
+            this.messagesArchieve = this.messagesArchieve ? [...this.messagesArchieve, ...messages] : [...messages];
+        }
+    }
+
+    canAdd(message: Message): boolean {
+        let allow = this.key === message.key;
+
+        if (allow && this.preventOpenDuplicates) {
+            allow = !this.containsMessage(this.messages, message);
+        }
+
+        if (allow && this.preventDuplicates) {
+            allow = !this.containsMessage(this.messagesArchieve, message);
+        }
+
+        return allow;
+    }
+
+    containsMessage(collection: Message[], message: Message): boolean {
+        if (!collection) {
+            return false;
+        }
+
+        return collection.find(m => {
+           return (m.summary === message.summary && m.detail && message.detail && m.severity === message.severity);
+        }) != null;
     }
 
     ngAfterContentInit() {
@@ -232,12 +285,15 @@ export class Toast implements OnInit,AfterContentInit,OnDestroy {
         this.onClose.emit({
             message: event.message
         });
+
+        this.cd.detectChanges();
     }
 
     enableModality() {
         if (!this.mask) {
             this.mask = document.createElement('div');
             this.mask.style.zIndex = String(parseInt(this.containerViewChild.nativeElement.style.zIndex) - 1);
+            this.mask.style.display = 'block';
             let maskStyleClass = 'ui-widget-overlay ui-dialog-mask';
             DomHandler.addMultipleClasses(this.mask, maskStyleClass);
             document.body.appendChild(this.mask);

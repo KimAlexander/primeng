@@ -1,5 +1,5 @@
 import {Component,OnInit} from '@angular/core';
-import {MenuItem} from '../../../components/common/api';
+import {MenuItem} from 'primeng/api';
 
 @Component({
     templateUrl: './toolbardemo.html',
@@ -23,8 +23,8 @@ export class ToolbarDemo implements OnInit {
     
     ngOnInit() {
         this.items = [
-            {label: 'Angular.io', icon: 'fa fa-link', url: 'http://angular.io'},
-            {label: 'Theming', icon: 'fa fa-paint-brush', routerLink: ['/theming']}
+            {label: 'Angular.io', icon: 'pi pi-external-link', url: 'http://angular.io'},
+            {label: 'Theming', icon: 'pi pi-palette', routerLink: ['/theming']}
         ];
     }
 }

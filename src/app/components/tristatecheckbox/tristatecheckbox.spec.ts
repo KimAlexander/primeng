@@ -57,12 +57,12 @@ describe('TriStateCheckbox', () => {
 
     it('should change stlye and styleClass', () => {
       tristate.styleClass = "Primeng ROCKS!";
-      tristate.style = {'primeng':'rocks!'};
+      tristate.style = {'height':'300px'};
       fixture.detectChanges();
 
       const tristatecheckboxEl = fixture.debugElement.query(By.css('div')).nativeElement;
       expect(tristatecheckboxEl.className).toContain("Primeng ROCKS!");
-      expect(tristatecheckboxEl.style.primeng).toContain("rocks!");
+      expect(tristatecheckboxEl.style.height).toContain("300px");
     });
 
     it('should get a name inputId and tabIndex', () => {
@@ -162,7 +162,7 @@ describe('TriStateCheckbox', () => {
       expect(tristate.value).toEqual(null);
       expect(value.value).toEqual(tristate.value);
       expect(checkBoxEl.className).not.toContain("ui-state-active");
-      expect(checkBoxIconEl.className).toEqual("ui-chkbox-icon pi ui-clickable");
+      expect(checkBoxIconEl.className).toContain("ui-clickable");
       expect(labeEl.className).not.toContain("ui-label-active");
       expect(onClickSpy).toHaveBeenCalledTimes(3);
     });
@@ -202,5 +202,23 @@ describe('TriStateCheckbox', () => {
 
       expect(onKeydownSpy).toHaveBeenCalled();
       expect(tristate.value).toBeUndefined();
+    });
+
+    it('should call onKeydown', () => {
+      tristate.label = "Primeng";
+      fixture.detectChanges();
+
+      let value;
+      tristate.onChange.subscribe(data => value = data);
+      const onKeydownSpy = spyOn(tristate, 'onKeyup').and.callThrough();
+      const inputEl = fixture.debugElement.query(By.css('input'));
+      const openEvent: any = document.createEvent('CustomEvent');
+      openEvent.keyCode = 32;
+      openEvent.initEvent('keyup', true, true);
+      inputEl.nativeElement.dispatchEvent(openEvent);
+      fixture.detectChanges();
+
+      expect(onKeydownSpy).toHaveBeenCalled();
+      expect(tristate.value).toBeTruthy();
     });
 });

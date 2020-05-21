@@ -4,7 +4,7 @@ import { Menu, MenuItemContent } from './menu';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Component } from '@angular/core';
-import { Button } from '../button/button';
+import { ButtonModule } from '../button/button';
 
 @Component({
   template: `<p-menu #menu></p-menu>
@@ -23,13 +23,13 @@ describe('Menu', () => {
       TestBed.configureTestingModule({
         imports: [
           NoopAnimationsModule,
-          RouterTestingModule
+          RouterTestingModule,
+          ButtonModule
         ],
         declarations: [
           Menu,
           MenuItemContent,
-          TestMenuComponent,
-          Button
+          TestMenuComponent
         ]
       });
       
@@ -53,15 +53,15 @@ describe('Menu', () => {
     });
 
     it('should change style and styleClass', () => {
-      menu.style = {'primeng' : 'rocks!'};
+      menu.style = {'height' : '300px'};
       menu.styleClass = "Primeng ROCKS!";
       fixture.detectChanges();
       
       const containerEl = fixture.debugElement.query(By.css('.ui-menu'));
       expect(containerEl.nativeElement.className).toContain("Primeng ROCKS!");      
       expect(containerEl.nativeElement.className).toContain(menu.styleClass);
-      expect(containerEl.nativeElement.style.primeng).toEqual(menu.style.primeng);
-      expect(containerEl.nativeElement.style.primeng).toEqual("rocks!");
+      expect(containerEl.nativeElement.style.height).toEqual(menu.style.height);
+      expect(containerEl.nativeElement.style.height).toEqual("300px");
     });
 
     it('should call hasSubMenu and return false', () => {
@@ -115,10 +115,8 @@ describe('Menu', () => {
       }]; 
       fixture.detectChanges();
       
-      const menuItemsEl = fixture.debugElement.queryAll(By.css('.ui-menuitem'));
-      expect(menuItemsEl.length).toEqual(2);
-      for(let menuItem of menuItemsEl)
-        expect(menuItem.nativeElement.className).toContain("ui-helper-hidden");
+      const menuItemsEl = fixture.debugElement.queryAll(By.css('.ui-helper-hidden'));
+      expect(menuItemsEl.length).toEqual(3);
     });
 
     it('should not show items (subMenu visible false)', () => {
@@ -131,18 +129,16 @@ describe('Menu', () => {
       }]; 
       fixture.detectChanges();
       
-      const menuItemsEl = fixture.debugElement.queryAll(By.css('.ui-menuitem'));
+      const menuItemsEl = fixture.debugElement.queryAll(By.css('.ui-helper-hidden'));
       expect(menuItemsEl.length).toEqual(2);
-      for(let menuItem of menuItemsEl)
-        expect(menuItem.nativeElement.className).toContain("ui-helper-hidden");
     });
 
     it('should change menuItemStyle and menuItemStyleClass', () => {
       menu.model  = [{
         label: 'File',
         items: [
-          {label: 'New', icon: 'pi pi-fw pi-plus',style:{'primeng':'rocks!'},styleClass:"Primeng ROCKS!"},
-          {label: 'Download', icon: 'pi pi-fw pi-download',style:{'primeng':'rocks!'},styleClass:"Primeng ROCKS!"}
+          {label: 'New', icon: 'pi pi-fw pi-plus',style:{'height':'300px'},styleClass:"Primeng ROCKS!"},
+          {label: 'Download', icon: 'pi pi-fw pi-download',style:{'height':'300px'},styleClass:"Primeng ROCKS!"}
         ]
       }]; 
       fixture.detectChanges();
@@ -151,7 +147,7 @@ describe('Menu', () => {
       expect(menuItemsEl.length).toEqual(2);
       for(let menuItem of menuItemsEl){
         expect(menuItem.nativeElement.className).toContain("Primeng ROCKS!");
-        expect(menuItem.nativeElement.style.primeng).toContain("rocks!");
+        expect(menuItem.nativeElement.style.height).toContain("300px");
       }
     });
 

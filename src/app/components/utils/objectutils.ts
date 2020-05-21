@@ -1,4 +1,4 @@
-import {SelectItem} from '../common/selectitem';
+import {SelectItem} from 'primeng/api';
 
 export class ObjectUtils {
 
@@ -60,11 +60,11 @@ export class ObjectUtils {
     }
 
     public static resolveFieldData(data: any, field: any): any {
-        if(data && field) {
+        if (data && field) {
             if (this.isFunction(field)) {
                 return field(data);
             }
-            else if(field.indexOf('.') == -1) {
+            else if (field.indexOf('.') == -1) {
                 return data[field];
             }
             else {
@@ -88,25 +88,6 @@ export class ObjectUtils {
         return !!(obj && obj.constructor && obj.call && obj.apply);
     }
 
-    public static filter(value: any[], fields: any[], filterValue: string) {
-        let filteredItems: any[] = [];
-        let filterText = this.removeAccents(filterValue).toLowerCase();
-
-        if(value) {
-            for(let item of value) {
-                for(let field of fields) {
-                    let fieldValue = this.removeAccents(String(this.resolveFieldData(item, field))).toLowerCase();
-                    if(fieldValue.indexOf(filterText) > -1) {
-                        filteredItems.push(item);
-                        break;
-                    }
-                }
-            }
-        }
-
-        return filteredItems;
-    }
-
     public static reorderArray(value: any[], from: number, to: number) {
         let target: number;
         if (value && from !== to) {
@@ -120,7 +101,7 @@ export class ObjectUtils {
 
     public static generateSelectItems(val: any[], field: string): SelectItem[] {
         let selectItems: SelectItem[];
-        if(val && val.length) {
+        if (val && val.length) {
             selectItems = [];
             for(let item of val) {
                 selectItems.push({label: this.resolveFieldData(item, field), value: item});
@@ -131,18 +112,18 @@ export class ObjectUtils {
     }
 
     public static insertIntoOrderedArray(item: any, index: number, arr: any[], sourceArr: any[]): void {
-        if(arr.length > 0) {
+        if (arr.length > 0) {
             let injected = false;
             for(let i = 0; i < arr.length; i++) {
                 let currentItemIndex = this.findIndexInList(arr[i], sourceArr);
-                if(currentItemIndex > index) {
+                if (currentItemIndex > index) {
                     arr.splice(i, 0, item);
                     injected = true;
                     break;
                 }
             }
 
-            if(!injected) {
+            if (!injected) {
                 arr.push(item);
             }
         }
@@ -154,9 +135,9 @@ export class ObjectUtils {
     public static findIndexInList(item: any, list: any): number {
         let index: number = -1;
 
-        if(list) {
+        if (list) {
             for(let i = 0; i < list.length; i++) {
-                if(list[i] == item) {
+                if (list[i] == item) {
                     index = i;
                     break;
                 }

@@ -3,6 +3,7 @@ import { By } from '@angular/platform-browser';
 import { Toolbar } from './toolbar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Component } from '@angular/core';
+import { ButtonModule } from '../button/button';
 
 @Component({
   template: `<p-toolbar>
@@ -29,7 +30,8 @@ describe('Toolbar', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [
-          NoopAnimationsModule
+          NoopAnimationsModule,
+          ButtonModule
         ],
         declarations: [
           Toolbar,
@@ -50,13 +52,13 @@ describe('Toolbar', () => {
     });
 
     it('should change style and styleClass', () => {
-      toolbar.style = {'primeng' : 'rocks!'};
+      toolbar.style = {'height' : '300px'};
       toolbar.styleClass = "Primeng ROCKS!";
       fixture.detectChanges();
 
       const toolbarEl = fixture.debugElement.query(By.css('div')).nativeElement;
       expect(toolbarEl.className).toContain("Primeng ROCKS!");
-      expect(toolbarEl.style.primeng).toEqual("rocks!");
+      expect(toolbarEl.style.height).toEqual("300px");
     });
 
     it('should show ng-content', () => {

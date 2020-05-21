@@ -16,6 +16,7 @@
 
 .ui-table .ui-sortable-column {
     cursor: pointer;
+    user-select: none;
 }
 
 .ui-table p-sorticon {
@@ -156,6 +157,10 @@
 @media screen and (max-width: 40em) {
     .ui-table-responsive .ui-table-thead > tr > th,
     .ui-table-responsive .ui-table-tfoot > tr > td {
+        display: none !important;
+    }
+
+    .ui-table-responsive colgroup {
         display: none !important;
     }
 

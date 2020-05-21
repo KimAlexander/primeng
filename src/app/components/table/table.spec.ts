@@ -1,14 +1,13 @@
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { Table, TableBody, ScrollableView, SortableColumn, SelectableRow, RowToggler, ContextMenuRow, ResizableColumn, ReorderableColumn, EditableColumn, CellEditor, SortIcon, TableRadioButton, TableCheckbox, TableHeaderCheckbox, ReorderableRowHandle, ReorderableRow, SelectableRowDblClick } from './table';
+import { Table, TableModule, EditableColumn } from './table';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Component } from '@angular/core';
-import { Paginator } from '../paginator/paginator';
-import {Dropdown, DropdownItem} from '../dropdown/dropdown';
+import { DropdownModule} from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
-import { SharedModule } from '../common/shared';
-import { ContextMenu, ContextMenuSub } from '../contextmenu/contextmenu';
+import { SharedModule } from 'primeng/api';
+import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { RouterTestingModule } from '@angular/router/testing';
 
 @Component({
@@ -51,7 +50,7 @@ import { RouterTestingModule } from '@angular/router/testing';
     <p-table class="filterTable" #dt [columns]="cols" [value]="cars">
         <ng-template pTemplate="caption">
             <div style="text-align: right">        
-                <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                <i class="pi pi-search" style="margin:4px 4px 0 0"></i>
                 <input type="text" class="globalFilter" pInputText size="50" placeholder="Global Filter" (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
             </div>
         </ng-template>
@@ -290,7 +289,7 @@ import { RouterTestingModule } from '@angular/router/testing';
         <ng-template pTemplate="body" let-rowData let-columns="columns" let-index="rowIndex">
             <tr [pReorderableRow]="index">
                 <td>
-                    <i class="fa fa-bars" pReorderableRowHandle></i>
+                    <i class="pi pi-bars" pReorderableRowHandle></i>
                 </td>
                 <td *ngFor="let col of columns">
                     {{rowData[col.field]}}
@@ -429,36 +428,17 @@ describe('Table', () => {
                 FormsModule,
                 SharedModule,
                 ScrollingModule,
+                DropdownModule,
+                ContextMenuModule,
+                TableModule,
                 RouterTestingModule.withRoutes([
                     { path: 'test', component: ContextMenu }
                 ]),
 
             ],
             declarations: [
-                Table,
-                SortableColumn,
-                SelectableRow,
-                RowToggler,
-                ContextMenuRow,
-                ResizableColumn,
-                ReorderableColumn,
-                EditableColumn,
-                CellEditor,
-                TableBody,
-                ScrollableView,
-                SortIcon,
-                TableRadioButton,
-                TableCheckbox,
-                TableHeaderCheckbox,
-                ReorderableRowHandle,
-                ReorderableRow,
-                SelectableRowDblClick,
-                Paginator,
-                Dropdown,
-                DropdownItem,
-                ContextMenu,
-                ContextMenuSub,
                 TestBasicTableComponent,
+                EditableColumn
             ]
         });
 
@@ -1128,6 +1108,7 @@ describe('Table', () => {
         fixture.detectChanges();
 
         let cell = fixture.debugElement.query(By.css(".ui-editable-column"));
+        let editableDir = cell.parent.query(By.directive(EditableColumn)).injector.get(EditableColumn);
         cell.nativeElement.click();
         fixture.detectChanges();
 
@@ -1136,6 +1117,7 @@ describe('Table', () => {
         keydownEvent.keyCode = 13;
         keydownEvent.initEvent('keydown', true, true);
         cell.nativeElement.dispatchEvent(keydownEvent);
+        editableDir.onEnterKeyDown(keydownEvent);
         fixture.detectChanges();
 
         expect(editableTable.editingCell).toBeFalsy();
@@ -1145,6 +1127,7 @@ describe('Table', () => {
         expect(editableTable.editingCell).toBeTruthy();
         keydownEvent.keyCode = 27;
         cell.nativeElement.dispatchEvent(keydownEvent);
+        editableDir.onEscapeKeyDown(keydownEvent);
         fixture.detectChanges();
 
         expect(editableTable.editingCell).toBeFalsy();
@@ -1155,15 +1138,20 @@ describe('Table', () => {
 
         let cellEls = fixture.debugElement.queryAll(By.css(".ui-editable-column"));
         let cell = cellEls[0];
+        let editableDir = cell.parent.query(By.directive(EditableColumn)).injector.get(EditableColumn);
+        const moveToNextCellSpy = spyOn(editableDir, 'moveToNextCell').and.callThrough();
         cell.nativeElement.click();
         fixture.detectChanges();
 
         expect(editableTable.editingCell).toBeTruthy();
-        cell.triggerEventHandler("keydown",{target:cell.children[0].children[0].nativeElement,keyCode:9,preventDefault(){}})
+        const keydownEvent: any = document.createEvent('CustomEvent');
+        keydownEvent.keyCode = 9;
+        keydownEvent.initEvent('keydown', true, true);
+        keydownEvent.shiftKey = false;
+        editableDir.onShiftKeyDown(keydownEvent);
         fixture.detectChanges();
 
-        expect(editableTable.editingCell).not.toEqual(cell.nativeElement);
-        expect(editableTable.editingCell).toEqual(cellEls[1].nativeElement);
+        expect(moveToNextCellSpy).toHaveBeenCalled();
     });
 
     it('should open prev cell', () => {
@@ -1175,11 +1163,16 @@ describe('Table', () => {
         fixture.detectChanges();
 
         expect(editableTable.editingCell).toBeTruthy();
-        cell.triggerEventHandler("keydown",{target:cell.children[0].children[0].nativeElement,keyCode:9,shiftKey:true,preventDefault(){}})
+        let editableDir = cell.parent.query(By.directive(EditableColumn)).injector.get(EditableColumn);
+        const moveToPreviousCellSpy = spyOn(editableDir, 'moveToPreviousCell').and.callThrough();
+        const keydownEvent: any = document.createEvent('CustomEvent');
+        keydownEvent.keyCode = 9;
+        keydownEvent.initEvent('keydown', true, true);
+        keydownEvent.shiftKey = true;
+        editableDir.onShiftKeyDown(keydownEvent);
         fixture.detectChanges();
 
-        expect(editableTable.editingCell).not.toEqual(cell.nativeElement);
-        expect(editableTable.editingCell).toEqual(cellEls[0].nativeElement);
+        expect(moveToPreviousCellSpy).toHaveBeenCalled();
     });
 
     it('should open expansion', () => {
@@ -1208,6 +1201,7 @@ describe('Table', () => {
         const event: any = document.createEvent('CustomEvent');
         event.pageX = 450;
         event.initEvent('mousedown');
+        event.which = 1;
         let firstWidth = resizerEls[0].parentElement.clientWidth;
         resizerEls[0].dispatchEvent(event as MouseEvent);
         fixture.detectChanges();
@@ -1240,6 +1234,7 @@ describe('Table', () => {
         const onColumnResizeBeginSpy = spyOn(colResizeTable,"onColumnResizeBegin").and.callThrough();
         const event: any = document.createEvent('CustomEvent');
         event.pageX = 450;
+        event.which = 1;
         event.initEvent('mousedown');
         let firstWidth = resizerEls[0].parentElement.clientWidth;
         resizerEls[0].dispatchEvent(event as MouseEvent);
@@ -1275,6 +1270,7 @@ describe('Table', () => {
         const onColumnResizeBeginSpy = spyOn(colResizeTable,"onColumnResizeBegin").and.callThrough();
         const event: any = document.createEvent('CustomEvent');
         event.pageX = 450;
+        event.which = 1;
         event.initEvent('mousedown');
         let firstWidth = resizerEls[0].parentElement.clientWidth;
         resizerEls[0].dispatchEvent(event as MouseEvent);
@@ -1312,6 +1308,7 @@ describe('Table', () => {
         const onColumnResizeBeginSpy = spyOn(colResizeTable,"onColumnResizeBegin").and.callThrough();
         const event: any = document.createEvent('CustomEvent');
         event.pageX = 450;
+        event.which = 1;
         event.initEvent('mousedown');
         let firstWidth = resizerEls[0].parentElement.clientWidth;
         resizerEls[0].dispatchEvent(event as MouseEvent);

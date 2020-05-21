@@ -2,9 +2,9 @@ import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testin
 import { By } from '@angular/platform-browser';
 import { Calendar } from './calendar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ButtonModule } from '../button/button';
+import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { SharedModule } from '../common/shared';
+import { SharedModule } from 'primeng/api';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Calendar', () => {
@@ -55,13 +55,13 @@ describe('Calendar', () => {
 
     it('should change panelStyle and panelStyleClass', () => {
       calendar.panelStyleClass = "Primeng ROCKS!";
-      calendar.panelStyle = {'primeng' : 'rocks!'};
+      calendar.panelStyle = {'height' : '300px'};
       calendar.overlayVisible = true;
       fixture.detectChanges();
 
       const panelEl = fixture.debugElement.query(By.css('div'));
       expect(panelEl.nativeElement.className).toContain("Primeng ROCKS!");
-      expect(panelEl.nativeElement.style.primeng).toContain("rocks!");
+      expect(panelEl.nativeElement.style.height).toContain("300px");
     });
 
     it('should change inputId', () => {
@@ -95,7 +95,7 @@ describe('Calendar', () => {
       const calenderEl = fixture.debugElement.query(By.css('span'));
       const buttonEl = fixture.debugElement.query(By.css('button'));
       expect(calenderEl.nativeElement.className).toContain('ui-calendar-w-btn');
-      expect(buttonEl.nativeElement.attributes[6].value).toEqual("pi pi-calendar");
+      expect(buttonEl.nativeNode.outerHTML).toContain("pi pi-calendar");
     });
 
     it('should change icon', () => {
@@ -104,7 +104,7 @@ describe('Calendar', () => {
       fixture.detectChanges();
 
       const buttonEl = fixture.debugElement.query(By.css('button'));
-      expect(buttonEl.nativeElement.attributes[6].value).toEqual("Primeng ROCKS!");
+      expect(buttonEl.nativeNode.outerHTML).toContain("Primeng ROCKS!");
     });
 
     it('should show panel and call onInputClick when inputClick', () => {
@@ -271,7 +271,7 @@ describe('Calendar', () => {
       expect(onDateSelectSpy).toHaveBeenCalled();
       expect(selectedTdEl).toBeTruthy();
       for(let x=0; x<datesEl.length; x++){
-        if(x == 7)
+        if (x == 7)
           expect(datesEl[x].nativeElement.className).toContain("ui-state-active");
         else
           expect(datesEl[x].nativeElement.className).not.toContain("ui-state-active");
@@ -298,7 +298,7 @@ describe('Calendar', () => {
       fixture.detectChanges();
 
       expect(calendar.inputFieldValue).toEqual(inputEl.value);
-      if(calendar.currentMonth < 9)
+      if (calendar.currentMonth < 9)
         expect(calendar.inputFieldValue).toEqual("05/0"+(calendar.currentMonth+1)+"/"+calendar.currentYear);
       else
         expect(calendar.inputFieldValue).toEqual("05/"+(calendar.currentMonth+1)+"/"+calendar.currentYear);
@@ -363,7 +363,7 @@ describe('Calendar', () => {
       const unselectableEls = containerEl.queryAll(By.css('.ui-state-default.ui-state-disabled'));
       let invalidDateArray = [];
       for (let el of unselectableEls){
-        if(el.nativeElement.textContent == invalidDate.getDate() || el.nativeElement.textContent == invalidDate2.getDate()){
+        if (el.nativeElement.textContent == invalidDate.getDate() || el.nativeElement.textContent == invalidDate2.getDate()){
           invalidDateArray.push(el.nativeElement.textContent);
         }
       }
@@ -490,7 +490,7 @@ describe('Calendar', () => {
       expect(decrementMinuteSpy).toHaveBeenCalled();
       expect(incrementMinuteSpy).toHaveBeenCalled();
       expect(fixture.debugElement.query(By.css('input')).nativeElement.value).toEqual(calendar.inputFieldValue);
-      if(calendar.currentHour<10 && calendar.currentMinute<10)
+      if (calendar.currentHour<10 && calendar.currentMinute<10)
         expect(calendar.inputFieldValue).toEqual("08/08/2008"+" 0"+calendar.currentHour+":0"+calendar.currentMinute);
       else if (calendar.currentHour<10)
         expect(calendar.inputFieldValue).toEqual("08/08/2008"+" 0"+calendar.currentHour+":"+calendar.currentMinute);
@@ -762,7 +762,7 @@ describe('Calendar', () => {
 
       tick(150);
       expect(calendar.overlayVisible).toEqual(false);
-      if(calendar.currentMonth<9)
+      if (calendar.currentMonth<9)
         expect(calendar.inputFieldValue).toEqual("0"+(calendar.currentMonth+1)+"/01/"+calendar.currentYear);
       else
         expect(calendar.inputFieldValue).toEqual((calendar.currentMonth+1)+"/01/"+calendar.currentYear);
@@ -1418,7 +1418,7 @@ describe('Calendar', () => {
       dates[0].nativeElement.click();
       fixture.detectChanges();
 
-      expect(calendar.currentMonth).toEqual(7);
+      expect(calendar.value.getMonth()).toEqual(7);
     });
 
     it('should change showOtherMonths', () => {

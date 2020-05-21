@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Listbox } from './listbox';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { TooltipModule } from 'primeng/tooltip';
 
 describe('Listbox', () => {
   
@@ -11,7 +12,8 @@ describe('Listbox', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [
-          NoopAnimationsModule
+          NoopAnimationsModule,
+          TooltipModule
         ],
         declarations: [
           Listbox
@@ -113,13 +115,13 @@ describe('Listbox', () => {
 
 
     it('should change style and styleClass', () => {
-        listbox.style = {'primeng' : 'rocks!'};
+        listbox.style = {'height' : '300px'};
         listbox.styleClass = "Primeng ROCKS!"
         fixture.detectChanges();
         
         const listboxEl = fixture.debugElement.query(By.css('div')).nativeElement;
         expect(listboxEl.className).toContain("Primeng ROCKS!");
-        expect(listboxEl.style.primeng).toEqual("rocks!");
+        expect(listboxEl.style.height).toEqual("300px");
     });
 
     it('should select item when click', () => {
@@ -301,10 +303,10 @@ describe('Listbox', () => {
         fixture.detectChanges();
 
         for(let x =0; x<10; x++ ){
-        if(x == 2 || x==3){
+        if (x == 2 || x==3){
             expect(fixture.debugElement.query(By.css('ul')).children[x].nativeElement.style.display).toEqual("block");
         }
-        else{
+        else {
             expect(fixture.debugElement.query(By.css('ul')).children[x].nativeElement.style.display).toEqual("none");
         }
         }
@@ -571,35 +573,12 @@ describe('Listbox', () => {
         fixture.detectChanges();
 
         for(let x =0; x<10; x++ ){
-            if(x == 1){
+            if (x == 1){
                 expect(fixture.debugElement.query(By.css('ul')).children[x].nativeElement.style.display).toEqual("block");
             }
-            else{
+            else {
                 expect(fixture.debugElement.query(By.css('ul')).children[x].nativeElement.style.display).toEqual("none");
             }
-        }
-    });
-
-    it('should show all items with wrong filterMode', () => {
-        listbox.options = [
-            {label: 'Audi', value: 'Audi'},
-            {label: 'BMW', value: 'BMW'},
-            {label: 'Fiat', value: 'Fiat'},
-            {label: 'Ford', value: 'Ford'},
-            {label: 'Honda', value: 'Honda'},
-            {label: 'Jaguar', value: 'Jaguar'},
-            {label: 'Mercedes', value: 'Mercedes'},
-            {label: 'Renault', value: 'Renault'},
-            {label: 'VW', value: 'VW'},
-            {label: 'Volvo', value: 'Volvo'}
-        ];
-        listbox.filterMode = "somethingWrong";
-        listbox.filter = true;
-        listbox.filterValue = "Bmw";
-        fixture.detectChanges();
-
-        for(let x =0; x<10; x++ ){
-                expect(fixture.debugElement.query(By.css('ul')).children[x].nativeElement.style.display).toEqual("block");
         }
     });
 

@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Inplace } from './inplace';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ButtonModule } from '../button/button';
 
 describe('Inplace', () => {
   
@@ -11,10 +12,11 @@ describe('Inplace', () => {
     beforeEach(() => {
     TestBed.configureTestingModule({
         imports: [
-        NoopAnimationsModule
+            NoopAnimationsModule,
+            ButtonModule
         ],
         declarations: [
-        Inplace
+            Inplace
         ]
     });
 
@@ -30,7 +32,7 @@ describe('Inplace', () => {
     });
 
     it('should change style styleClass and closable', () => {
-        inplace.style = {'primeng': 'rocks!'};
+        inplace.style = {'height': '300px'};
         inplace.styleClass = "Primeng ROCKS!";
         inplace.closable = true;
         inplace.active = true;
@@ -40,7 +42,7 @@ describe('Inplace', () => {
         const closableButton = fixture.debugElement.query(By.css('button'));
         expect(inplaceEl.nativeElement.className).toContain("Primeng ROCKS!");
         expect(inplaceEl.nativeElement.className).toContain("ui-inplace-closable");
-        expect(inplaceEl.nativeElement.style.primeng).toContain("rocks!");
+        expect(inplaceEl.nativeElement.style.height).toContain("300px");
         expect(closableButton).toBeTruthy();
     });
 

@@ -1,11 +1,10 @@
-import {NgModule,Component,ElementRef,Input,Output,OnInit,AfterContentInit,OnDestroy,EventEmitter,TemplateRef,EmbeddedViewRef,ViewContainerRef,
-        Inject,forwardRef,ContentChildren,QueryList} from '@angular/core';
+import {NgModule,Component,ElementRef,Input,Output,AfterContentInit,EventEmitter,TemplateRef,
+        Inject,forwardRef,ContentChildren,QueryList,ChangeDetectionStrategy} from '@angular/core';
 import {trigger,state,style,transition,animate} from '@angular/animations';
 import {CommonModule} from '@angular/common';
-import {DomHandler} from '../dom/domhandler';
-import {SharedModule} from '../common/shared';
-import {TreeNode} from '../common/treenode';
-import {PrimeTemplate} from '../common/shared';
+import {SharedModule} from 'primeng/api';
+import {TreeNode} from 'primeng/api';
+import {PrimeTemplate} from 'primeng/api';
 
 @Component({
     selector: '[pOrganizationChartNode]',
@@ -25,12 +24,12 @@ import {PrimeTemplate} from '../common/shared';
                 </div>
             </td>
         </tr>
-        <tr [style.visibility]="!leaf&&node.expanded ? 'inherit' : 'hidden'" class="ui-organizationchart-lines" [@childState]="'in'">
+        <tr [ngClass]="!leaf&&node.expanded ? 'ui-organizationchart-node-visible' : 'ui-organizationchart-node-hidden'" class="ui-organizationchart-lines" [@childState]="'in'">
             <td [attr.colspan]="colspan">
                 <div class="ui-organizationchart-line-down"></div>
             </td>
         </tr>
-        <tr [style.visibility]="!leaf&&node.expanded ? 'inherit' : 'hidden'" class="ui-organizationchart-lines" [@childState]="'in'">
+        <tr [ngClass]="!leaf&&node.expanded ? 'ui-organizationchart-node-visible' : 'ui-organizationchart-node-hidden'" class="ui-organizationchart-lines" [@childState]="'in'">
             <ng-container *ngIf="node.children && node.children.length === 1">
                 <td [attr.colspan]="colspan">
                     <div class="ui-organizationchart-line-down"></div>
@@ -43,7 +42,7 @@ import {PrimeTemplate} from '../common/shared';
                 </ng-template>
             </ng-container>
         </tr>
-        <tr [style.visibility]="!leaf&&node.expanded ? 'inherit' : 'hidden'" class="ui-organizationchart-nodes" [@childState]="'in'">
+        <tr [ngClass]="!leaf&&node.expanded ? 'ui-organizationchart-node-visible' : 'ui-organizationchart-node-hidden'" class="ui-organizationchart-nodes" [@childState]="'in'">
             <td *ngFor="let child of node.children" colspan="2">
                 <table class="ui-organizationchart-table" pOrganizationChartNode [node]="child"></table>
             </td>
@@ -92,7 +91,7 @@ export class OrganizationChartNode {
     
     toggleNode(event: Event, node: TreeNode) {
         node.expanded = !node.expanded;
-        if(node.expanded)
+        if (node.expanded)
             this.chart.onNodeExpand.emit({originalEvent: event, node: this.node});
         else
             this.chart.onNodeCollapse.emit({originalEvent: event, node: this.node});
@@ -108,10 +107,11 @@ export class OrganizationChartNode {
 @Component({
     selector: 'p-organizationChart',
     template: `
-        <div [ngStyle]="style" [class]="styleClass" [ngClass]="'ui-organizationchart ui-widget'">
+        <div [ngStyle]="style" [class]="styleClass" [ngClass]="{'ui-organizationchart ui-widget': true, 'ui-organizationchart-preservespace': preserveSpace}">
             <table class="ui-organizationchart-table" pOrganizationChartNode [node]="root" *ngIf="root"></table>
         </div>
-    `
+    `,
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class OrganizationChart implements AfterContentInit {
             
@@ -124,6 +124,8 @@ export class OrganizationChart implements AfterContentInit {
     @Input() selectionMode: string;
     
     @Input() selection: any;
+
+    @Input() preserveSpace: boolean = true;
     
     @Output() selectionChange: EventEmitter<any> = new EventEmitter();
     
@@ -146,7 +148,7 @@ export class OrganizationChart implements AfterContentInit {
     }
     
     ngAfterContentInit() {
-        if(this.templates.length) {
+        if (this.templates.length) {
             this.templateMap = {};
         }
         
@@ -156,7 +158,7 @@ export class OrganizationChart implements AfterContentInit {
     }
     
     getTemplateForNode(node: TreeNode): TemplateRef<any> {
-        if(this.templateMap)
+        if (this.templateMap)
             return node.type ? this.templateMap[node.type] : this.templateMap['default'];
         else
             return null;
@@ -165,19 +167,19 @@ export class OrganizationChart implements AfterContentInit {
     onNodeClick(event: Event, node: TreeNode) {
         let eventTarget = (<Element> event.target);
         
-        if(eventTarget.className && (eventTarget.className.indexOf('ui-node-toggler') !== -1 || eventTarget.className.indexOf('ui-node-toggler-icon') !== -1)) {
+        if (eventTarget.className && (eventTarget.className.indexOf('ui-node-toggler') !== -1 || eventTarget.className.indexOf('ui-node-toggler-icon') !== -1)) {
             return;
         }
-        else if(this.selectionMode) {
-            if(node.selectable === false) {
+        else if (this.selectionMode) {
+            if (node.selectable === false) {
                 return;
             }
             
             let index = this.findIndexInSelection(node);
             let selected = (index >= 0);
             
-            if(this.selectionMode === 'single') {
-                if(selected) {
+            if (this.selectionMode === 'single') {
+                if (selected) {
                     this.selection = null;
                     this.onNodeUnselect.emit({originalEvent: event, node: node});
                 }
@@ -186,8 +188,8 @@ export class OrganizationChart implements AfterContentInit {
                     this.onNodeSelect.emit({originalEvent: event, node: node});
                 }
             }
-            else if(this.selectionMode === 'multiple') {
-                if(selected) {
+            else if (this.selectionMode === 'multiple') {
+                if (selected) {
                     this.selection = this.selection.filter((val,i) => i!=index);
                     this.onNodeUnselect.emit({originalEvent: event, node: node});
                 }
@@ -204,13 +206,13 @@ export class OrganizationChart implements AfterContentInit {
     findIndexInSelection(node: TreeNode) {
         let index: number = -1;
 
-        if(this.selectionMode && this.selection) {
-            if(this.selectionMode === 'single') {
+        if (this.selectionMode && this.selection) {
+            if (this.selectionMode === 'single') {
                 index = (this.selection == node) ? 0 : - 1;
             }
-            else if(this.selectionMode === 'multiple') {
+            else if (this.selectionMode === 'multiple') {
                 for(let i = 0; i  < this.selection.length; i++) {
-                    if(this.selection[i] == node) {
+                    if (this.selection[i] == node) {
                         index = i;
                         break;
                     }

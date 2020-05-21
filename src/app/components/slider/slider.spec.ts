@@ -55,13 +55,13 @@ describe('Slider', () => {
     });
 
     it('should change styles', () => {
-        slider.style = {'primeng':'rocks!'};
+        slider.style = {'height':'300px'};
         slider.styleClass = "Primeng ROCKS!";
         fixture.detectChanges();
 
         const sliderEl = fixture.debugElement.query(By.css('div')).nativeElement;
         expect(sliderEl.className).toContain("Primeng ROCKS!");
-        expect(sliderEl.style.primeng).toEqual("rocks!");
+        expect(sliderEl.style.height).toEqual("300px");
     });
 
     it('should change orientation', () => {
@@ -105,6 +105,8 @@ describe('Slider', () => {
     });
 
     it('should listen onChange', () => {
+        fixture.detectChanges();
+
         let value = 1;
         slider.onChange.subscribe(data => value = data.value);
         slider.updateValue(91);
@@ -114,6 +116,8 @@ describe('Slider', () => {
     });
 
     it('should change value with touch events (horizontal)', () => {
+        fixture.detectChanges();
+
         slider.updateValue(91);
         slider.handleValue = 91;
         fixture.detectChanges();
@@ -139,6 +143,8 @@ describe('Slider', () => {
     });
 
     it('should change value with touch events (vertical)', () => {
+        fixture.detectChanges();
+
         slider.orientation = "vertical";
         slider.updateValue(91);
         slider.handleValue = 91;

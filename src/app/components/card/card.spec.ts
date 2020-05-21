@@ -3,7 +3,8 @@ import { By } from '@angular/platform-browser';
 import { Card } from './card';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { Footer, Header } from '../common/shared';
+import { Footer, Header } from 'primeng/api';
+import { ButtonModule } from '../button/button';
 
 @Component({
   template: `<p-card>
@@ -30,7 +31,8 @@ describe('Card', () => {
       TestBed.configureTestingModule({
         schemas: [NO_ERRORS_SCHEMA],
         imports: [
-          NoopAnimationsModule
+          NoopAnimationsModule,
+          ButtonModule
         ],
         declarations: [
           Card,
@@ -72,12 +74,12 @@ describe('Card', () => {
 
     it('should change style and styleClass', () => {
       card.styleClass = "Primeng ROCKS!";
-      card.style = {'primeng' : 'rocks!'};
+      card.style = {'height' : '300px'};
       fixture.detectChanges();
 
       const cardEl = fixture.debugElement.query(By.css('div')).nativeElement;
       expect(cardEl.className).toContain("Primeng ROCKS!");
-      expect(cardEl.style.primeng).toEqual("rocks!");
+      expect(cardEl.style.height).toEqual("300px");
     });
 
     it('should have a header', () => {

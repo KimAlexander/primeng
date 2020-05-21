@@ -2,10 +2,10 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FileUpload } from './fileupload';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ProgressBarModule} from '../progressbar/progressbar';
-import { ButtonModule } from '../button/button';
-import { PrimeTemplate} from '../common/shared';
-import { MessagesModule } from '../messages/messages';
+import { ProgressBarModule} from 'primeng/progressbar';
+import { ButtonModule } from 'primeng/button';
+import { PrimeTemplate} from 'primeng/api';
+import { MessagesModule } from 'primeng/messages';
 import { HttpClientModule } from '@angular/common/http';
 
 describe('FileUpload', () => {
@@ -53,7 +53,7 @@ describe('FileUpload', () => {
     });
 
     it('should change style, styleClass, chooseLabel, uploadLabel, cancelLabel, showUploadButton and showCancelButton (advanced)', () => {
-        fileupload.style = {'primeng': 'rocks!'};
+        fileupload.style = {'height': '300px'};
         fileupload.styleClass = "Primeng ROCKS!";
         fileupload.chooseLabel = "primeng";
         fileupload.uploadLabel = "primeng";
@@ -66,7 +66,7 @@ describe('FileUpload', () => {
         const chooseButton =fixture.debugElement.query(By.css(".ui-fileupload-choose"));
         expect(fileuploadEl).toBeTruthy();
         expect(fileuploadEl.nativeElement.className).toContain("Primeng ROCKS!");
-        expect(fileuploadEl.nativeElement.style.primeng).toContain("rocks!");
+        expect(fileuploadEl.nativeElement.style.height).toContain("300px");
         expect(uploadButton).toBeTruthy();
         expect(cancelButton).toBeTruthy();
         expect(uploadButton.nativeElement.textContent).toEqual("primeng");
@@ -130,6 +130,73 @@ describe('FileUpload', () => {
         fixture.detectChanges();
 
         expect(uploadSpy).toHaveBeenCalled();
+    });
+
+    it('should not push same file', () => {
+        fileupload.multiple = true;
+        fileupload.url = " ";
+        fixture.detectChanges();
+
+        let event;
+        let blob:Blob;
+        blob = new Blob([JSON.stringify([{
+            'lastModified':1533276674178,
+            'name': 'primeng.txt',
+            'size': 179,
+            'type': "text/plain"
+        }])], {type : 'application/json'});
+        let blobFile = new File([blob], 'primeng.txt');
+        event = {
+            'target':{files: [blobFile]},
+            stopPropagation(){},
+            preventDefault(){}
+        };
+        fileupload.onFileSelect(event);
+        fixture.detectChanges();
+
+        expect(fileupload.files.length).toEqual(1);
+        fileupload.onFileSelect(event);
+        fixture.detectChanges();
+
+        expect(fileupload.files.length).toEqual(1);
+    });
+
+    it('should not push when exceeded filelimit', () => {
+        fileupload.multiple = true;
+        fileupload.fileLimit = 1;
+        fileupload.auto = true
+        fileupload.url = " ";
+        fixture.detectChanges();
+
+        let event;
+        let blob:Blob;
+        blob = new Blob([JSON.stringify([
+            {
+                'lastModified':1533276674178,
+                'name': 'primeng.txt',
+                'size': 179,
+                'type': "text/plain"
+            },
+            {
+                'lastModified':1533276674179,
+                'name': 'primeng2.txt',
+                'size': 123,
+                'type': "text/plain"
+            },
+        ])], {type : 'application/json'});
+        let blobFile = new File([blob], 'primeng.txt');
+        let blobFile2 = new File([blob], 'primeng2.txt');
+        event = {
+            'target':{files: [blobFile,blobFile2]},
+            stopPropagation(){},
+            preventDefault(){}
+        };
+        const uploadSpy = spyOn(fileupload,"upload").and.callThrough();
+        fileupload.onFileSelect(event);
+        fixture.detectChanges();
+
+        expect(fileupload.files.length).toEqual(2);
+        expect(uploadSpy).not.toHaveBeenCalled();
     });
 
     it('should call upload with customUpload (advanced)', () => {
